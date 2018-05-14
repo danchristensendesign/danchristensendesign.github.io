@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+<div id="canvDiv" class="unselectable" style="position:absolute;">
+	<canvas id="backCanv" style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
+	<canvas id="midCanv" style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
+	<canvas id="frontCanv" oncontextmenu="return false;" style="position: absolute; left: 0; top: 0; z-index: 2;"></canvas>	
+</div>
+
+
+<script>
+
+
+
+var fullWidth = 900;
+var fullHeight = 700;
+var mainLeft = 30;
+var mainTop = 30;
+var outMargin = 0;
+var inMargin = 0;
+var itemFont = "20px Arial"; 
+var itemTextFill = 'RGB(255,255,255)';
+var groupFont = "60px Arial";
+var groupTextFill = 'RGB(255,255,255)';
+var notHovered = .9;
+var grpScale = 4;
+var hovered = .7;
+var itemScale = 2;
+var images = 0;
+var loaded = 0;
+
+var mainDiv = document.getElementById("canvDiv");
+mainDiv.style.left = mainLeft + 'px';
+mainDiv.style.top = mainTop + 'px';
+var backCanv = document.getElementById("backCanv");
+backCanv.width = fullWidth;
+backCanv.height = fullHeight;
+var backCx = backCanv.getContext("2d");
+
+var midCanv = document.getElementById("midCanv");
+midCanv.width = fullWidth;
+midCanv.height = fullHeight;
+var midCx = midCanv.getContext("2d");
+midCx.textAlign = "center";
+midCx.textBaseline = "bottom";
+midCx.fillStyle = itemTextFill;
+midCx.font = itemFont;
+
+var frontCanv = document.getElementById("frontCanv");
+frontCanv.width = fullWidth;
+frontCanv.height = fullHeight;
+var frontCx = frontCanv.getContext("2d");
+frontCx.textAlign = "center";
+frontCx.textBaseline = "middle";
+frontCx.font = groupFont;
+
+document.addEventListener("mousemove", update2);
+console.log(frontCx.font);
+
+function group(str, color, col, row, cols, rows, colDivs, rowDivs) 
+{
+    
+	this.left = blockW * col;
+	this.top = blockH * row;
+	this.width = blockW * cols;
+	this.height = blockH * rows;
+	this.halfWidth = this.width/2;
+	this.halfHeight = this.height/2;
+	this.midLeft = this.left + this.halfWidth;
+	this.midTop = this.top + this.halfHeight;
+	this.str = str;
+	this.fill = color;
+	this.itemArr = [];
+	initArr(this.itemArr, colDivs, rowDivs);	
+	this.subW = this.width / colDivs;
+	this.subH = this.height / rowDivs;
+	this.cols = colDivs;
+	this.rows = rowDivs;
+	addToArr(this, col, row, cols, rows, groupArr);
+}
+
+function item(group, imag, str, col, row, cols, rows) 
+{
+    //this.group = group;
+	this.left = group.left + group.subW * col;
+	this.top = group.top + group.subH * row;
+	this.width = group.subW * cols;
+	this.height = group.subH * rows;
+	this.halfWidth = this.width/2;
+	this.halfHeight = this.height/2;
+	this.midLeft = this.left + this.halfWidth;
+	this.midTop = this.top + this.halfHeight;
+	this.str = str;
+	
+	this.img = document.createElement("img");
+	images+=1;
+	this.img.onload = function()
+    {
+        checkDraw();
+    }
+	this.img.src = imag;
+	console.log(this.img);
+	//this.img.onload = function(){drawImg(this)};
+	//this.img.onload = function(){console.log('hi');};
+	addToArr(this, col, row, cols, rows, group.itemArr); 	
+}
+
+
+// item(group, img, str, row, col, rows, cols) 
+// group(str, color, row, col, rows, cols, colDivs, rowDivs) 
+var groupCols = 2;
+var groupRows = 2;
+var blockW = fullWidth / groupCols;
+var blockH = fullHeight / groupRows;
+var groupArr = [];
+initArr(groupArr, groupCols, groupRows);
+
+var hardware = new group("hardware", 'RGB(255, 100,100)',0,0,1,1,2,2);
+var retropi = new item(hardware, "pi color.jpg", "retroPi", 0, 1, 1, 1);
+var synth = new item(hardware, "synth.jpg", "digital synth", 0, 0, 1, 1);
+var sign = new item(hardware, "sign.jpg", "New Belgium sign", 1, 0, 1, 2);
+
+var software = new group("software", 'RGB(50, 255,150)',1,0,1,1,2,2);
+var rm = new item(software, "rm2.jpg", "Sensory Tracker", 0,0, 2, 1);
+var wavTabler = new item(software, "wavtabler.jpg", "wav-tabler", 0,1,1,1);
+var blocks = new item(software, "blockjumper.jpg", "puzzle game", 1,1,1,1);
+
+var fabrication = new group("fabrication", 'RGB(50, 50,255)',0,1,1,1,2,2);
+var dresser = new item(fabrication, "dresser.jpg", "rotating dresser", 0,0, 1, 2);
+var table = new item(fabrication, "table.jpg", "plywood table", 1,0,1,1);
+var record = new item(fabrication, "record.jpg", "display shelf", 1,1,1,1);
+
+var art = new group("music & art", 'RGB(255, 50,255)',1,1,1,1,2,3);
+var miles = new item(art, "miles.jpg", "arrangements", 0,0, 1, 2);
+var house = new item(art, "house.jpg", "monster house", 1,0,1,2);
+var ship = new item(art, "ship.jpg", "ship", 0,2,2,1);
+
+
+function checkDraw()
+{
+	loaded += 1;
+	console.log(images + ' images... ' + loaded);
+	if(loaded == images) 
+	{
+		var grpDone = [];
+		for(var grpCol = 0; grpCol < groupCols; grpCol+= 1)
+		{
+			for(var grpRow = 0; grpRow < groupRows; grpRow+= 1)
+			{
+				var curGrp = groupArr[grpCol][grpRow];
+				if(curGrp != null && !grpDone.includes(curGrp))
+				{
+					drawGroup(curGrp, notHovered);
+					grpDone.push(curGrp);
+					var itemDone = [];
+					for(var itemCol = 0; itemCol < curGrp.cols; itemCol+= 1)
+					{
+						for(var itemRow = 0; itemRow < curGrp.rows; itemRow+= 1)
+						{
+							var curItem = curGrp.itemArr[itemCol][itemRow];
+							if(curItem != null && !itemDone.includes(curItem))
+							{
+								backCx.drawImage(curItem.img, curItem.left, curItem.top, curItem.width, curItem.height);
+								itemDone.push(curItem);
+							}
+						}
+					}
+				}
+				else console.log('skipped');
+			}
+		}
+	}
+}
+
+function drawGroup(group, pct)
+{				
+	midCx.clearRect(group.left, group.top, group.width, group.height);
+	frontCx.clearRect(group.left, group.top, group.width, group.height);
+	frontCx.globalAlpha = pct;
+	frontCx.fillStyle = group.fill;
+	frontCx.fillRect(group.left, group.top, group.width, group.height);
+	
+	if(pct >= notHovered)
+	{
+		frontCx.fillStyle = groupTextFill;
+		frontCx.fillText(group.str, group.midLeft, group.midTop);
+	}
+}
+
+
+		
+
+ 
+ 
+
+
+
+
+
+
+
+
+var lastGroup;
+
+
+function update2(event)
+{
+	//console.log(frontCx.font);
+	var xPct = 1;
+	var yPct = 1;
+	var grpPct;
+	var itemPct;
+	var curGroup = null;
+	var x = event.clientX - mainDiv.offsetLeft;
+	var y = event.clientY - mainDiv.offsetTop;
+	var outCol = x/blockW;
+	var outRow = y/blockH;
+	if(outCol >= 0 && outCol < groupCols && outRow >= 0 && outRow < groupRows)
+	{
+		var indX = Math.floor(outCol);
+		var indY = Math.floor(outRow);
+		curGroup = groupArr[indX][indY];
+		if(curGroup != null)
+		{
+			grpPct = Math.max(getPct(x, y, curGroup, grpScale), hovered);
+			midCx.clearRect(curGroup.left, curGroup.top, curGroup.width, curGroup.height);
+			frontCx.fillStyle = curGroup.fill;
+			frontCx.clearRect(curGroup.left, curGroup.top, curGroup.width, curGroup.height);
+			//console.log( (grpPct));
+			frontCx.globalAlpha = notHovered * grpPct;
+			frontCx.fillRect(curGroup.left, curGroup.top, curGroup.width, curGroup.height);
+			//console.log('item x ' + (outCol - indX) + ', y ' + Math.floor((outRow - indY) * curGroup.rows));
+			curItem = curGroup.itemArr[Math.floor((outCol - indX) * curGroup.cols)][Math.floor((outRow - indY) * curGroup.rows)];
+			if(curItem != null)
+			{
+				//console.log(curItem.str);
+				itemPct = getPct(x, y, curItem, itemScale);
+				frontCx.clearRect(curItem.left, curItem.top, curItem.width, curItem.height);
+				//frontCx.globalAlpha = grpPct * itemPct;
+				//frontCx.fillRect(curItem.left, curItem.top, curItem.width, curItem.height);
+				midCx.fillText(curItem.str, curItem.midLeft, curItem.top + curItem.height);	
+				//var rand = Math.floor(Math.random() * 255);
+				//backCx.fillStyle = 'RGB(' + rand + ',' + rand + ',' + rand + ')';
+				//backCx.fillRect(curItem.left, curItem.top, curItem.width, curItem.height);
+				//backCx.drawImage(curItem.img, curItem.left, curItem.top, curItem.width, curItem.height);
+			}
+		}
+	}
+	
+	//if the group changed, update the previous
+	if(lastGroup != null && lastGroup !== curGroup)
+	{
+		console.log('hi');
+		midCx.clearRect(lastGroup.left, lastGroup.top, lastGroup.width, lastGroup.height);
+		frontCx.clearRect(lastGroup.left, lastGroup.top, lastGroup.width, lastGroup.height);
+		frontCx.globalAlpha = notHovered;
+		frontCx.fillStyle = lastGroup.fill;
+		frontCx.fillRect(lastGroup.left, lastGroup.top, lastGroup.width, lastGroup.height);
+		frontCx.fillStyle = groupTextFill;
+		frontCx.fillText(lastGroup.str, lastGroup.midLeft, lastGroup.midTop);	
+	}
+
+	lastGroup = curGroup;
+}
+
+function drawImg(item)
+{
+	//backCx.drawImage(curItem.img, curItem.left, curItem.top, curItem.width, curItem.height);
+	backCx.drawImage(item.img, item.left, item.top, item.width, item.height)
+}
+
+function getPct(x, y, obj, scale)
+{
+	//console.log('midleft ' + (obj.midLeft) + ', halfwidth ' + (obj.halfWidth) + ', midtop ' + obj.midTop + ', halftop ' + obj.halfHeight);
+	return Math.pow(Math.max(Math.abs((x - obj.midLeft)/obj.halfWidth), Math.abs((y - obj.midTop)/obj.halfHeight)), scale);
+}
+
+function initArr(arr, cols, rows)
+{
+	for(var colInd = 0; colInd < cols; colInd += 1)
+	{
+		var tArr = [];
+		for(var rowInd = 0; rowInd < rows; rowInd += 1)
+		{
+			tArr.push(null);
+		}
+		arr.push(tArr);
+	}
+}
+
+function addToArr(obj, baseCol, baseRow, cols, rows, arr)
+{
+	for(var colInd = 0; colInd < cols; colInd += 1)
+	{
+		for(var rowInd = 0; rowInd < rows; rowInd += 1)
+		{
+			arr[baseCol + colInd][baseRow + rowInd] = obj;
+		}
+	}
+}
+
+</script>
+  
+
+</html> 
