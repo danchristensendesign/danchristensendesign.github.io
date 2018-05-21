@@ -389,15 +389,16 @@ function loadAllImages()
 		for(var grpRow = 0; grpRow < groupRows; grpRow+= 1)
 		{
 			var curGrp = groupArr[grpCol][grpRow];
-			if(curGrp != null && !grpDone.includes(curGrp))
+			if(!includes(curGrp, grpDone))
 			{
+				grpDone.push(curGrp);
 				var itemDone = [];
 				for(var itemCol = 0; itemCol < curGrp.cols; itemCol+= 1)
 				{
 					for(var itemRow = 0; itemRow < curGrp.rows; itemRow+= 1)
 					{
 						var curItem = curGrp.itemArr[itemCol][itemRow];
-						if(curItem != null && !itemDone.includes(curItem))
+						if(curItem != null && !includes(curItem, itemDone))
 						{
 							loadItemImages(curItem);
 							itemDone.push(curItem);
@@ -409,6 +410,15 @@ function loadAllImages()
 	}
 }
 
+function includes(item, arr)
+{
+	var done = false;
+	for(var x = 0; x < arr.length; x += 1)
+	{
+		if(arr[x] === item) return true;
+	}
+	return false;
+}
 
 
 function drawHeader()
