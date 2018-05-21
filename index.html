@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 
-<link href="https://fonts.googleapis.com/css?family=Roboto:900" rel="stylesheet">
+
+
 
 <script>
-
 
 var screenR = 4/3;
 var margin = 30;
@@ -84,13 +84,13 @@ var colors = [
 ]; */
 
 var colors = [
-	[210,84,32],
+	[210,0,31],
 	[191,100,26],
-	[153,6,31],
-	[172,0,64],
+	[153,1,31],
+	[191,9,53],
 	[40,63,39],
-	[172,93,29],
-	[34,40,29]
+	[185,0,29],
+	[34,0,52]
 ];
 
 /* var colors = [
@@ -877,7 +877,7 @@ function drawThumbHighlight(ind)
 		//reset x box
 		midCx.globalAlpha = 1;
 		if(ind == -2) midCx.fillStyle = 'RGB(255,0,0)';
-		else midCx.fillStyle = HSLtoStr(0);
+		else midCx.fillStyle = 'RGB(76,204,212)';//HSLtoStr(4);
 		midCx.fillRect(boxMidL - dataBox/2, boxMidT - dataBox/2, dataBox, dataBox);
 		
 		curTop = dataUseT + ind * (curThumbH + thumbSpc);
@@ -1010,7 +1010,7 @@ var synth = [
 	["Digital wave-table synthesizer prototype.", PIC, 'synth graphic2.jpg'],
 	["A prototype of my digital synthesizer. Its brain is the Axoloti Core microcontroller. \n \n This is my most recent and one of my most involved projects. It's a wave-table synth, which means the sound from each oscillator is generated from a table that holds one full cycle of any type of a wave. This method is ideal for running on a microcontroller because: 1. It requires a relatively small amount of processing power, and 2. It allows for a large variety of sounds because the table can be filled with samples from any type of wave. \n \n The two rows of buttons toggle between sixteen different screens for editing the various synth parameters (wave table, filter, arpeggiator, pitch envelope, etc.). The two columns of knobs control settings within the selected screen.", PIC, 'synth front.jpg'],
 	["The housing for this prototype allows me to easily take it apart to access wiring. I'm also able to tilt it in either direction for optimal visibility while it's still in the design phase. \n \n The synth has two eight-voice polyphonic oscillators (which means they can each play eight notes at a time), as wells as four monophonic oscillators (which can only play one note at a time). Every oscillator has its own filter and arpeggiator, as well as three separate envelopes (for amplitude, pitch, and filter cutoff/resonance). \n \n It has two midi inputs for connecting keyboards or other midi controllers, and a microSD card for saving and loading customized patches and wave tables.", PIC, 'synth cool.jpg'],
-	["This project has forced me to learn and grow in multiple areas: \n \n 1. Coding for microcontrollers. The board I'm using is the Axoloti Core board, which is based on an ARM chip, and runs code written in C. Working with this board has taught me to write efficient code, because everything needs to happen in real time and the processor has very real processing limits. \n \n 2. Using multiplexers to monitor more inputs than my board has pins for. Eight push button rotary encoders that have three signals each (two for turning, one for the button), as well as eight more buttons, totaling 32 inputs overall. I use multiple 8:1 multiplexers to check all of these using only four input pins. \n \n 3. Learning to work with LCD displays. Because the Axoloti Core has no built-in support for an LCD display, I wrote my own LCD library to output text to the screen. \n \n This particular screen is used to save patches.", PIC, 'synth screen1.jpg'],
+	["This project pushed me to learn and grow in multiple areas: \n \n 1. Coding for microcontrollers. The board I'm using is the Axoloti Core board, which is based on an ARM chip, and runs code written in C. Working with this board has taught me to write efficient code, because everything needs to happen in real time and the processor has very real processing limits. \n \n 2. Using multiplexers to monitor more inputs than my board has pins for. Eight push button rotary encoders that have three signals each (two for turning, one for the button), as well as eight more buttons, totaling 32 inputs overall. I use multiple 8:1 multiplexers to check all of these using only four input pins. \n \n 3. Learning to work with LCD displays. Because the Axoloti Core has no built-in support for an LCD display, I wrote my own LCD library to output text to the screen. \n \n This particular screen is used to save patches.", PIC, 'synth screen1.jpg'],
 	["Here you can see the Axoloti Core board as well as wiring for my various inputs.", PIC, 'synth back angle.jpg'],
 	["I soldered every knob and button onto perfboard (generic circuit board). \n \n My next improvement will be to design my own printed circuit board to make everything cleaner. Following that will be a more stylistic enclosure.", PIC, 'synth back.jpg'],
 	["", PIC, 'synth wires.jpg']
@@ -1018,7 +1018,7 @@ var synth = [
 
 var sign = [
 	["Rotating sign for New Belguim Brewery.", PIC, 'sign graphic2.jpg'],
-	["Here is a rotating sign I designed, built, and installed along a highly-trafficked tour corridor at New Belgium Brewery. \n \n The sign shows the occupied status of the quality assurance lab in a fun, stylized way. It is utilized by the employees and enjoyed by the guests. \n \n The \"Open\" box rotates to one of four positions based on input from a control panel within the lab, so the sign reads either \"we're open,\" \"we're in a meeting,\" \"we're open for panel,\" or \"we're in training\". The control panel is described in detail in a separate window on my main portfolio page.", PIC, 'sign full.jpg'],
+	["Here is a rotating sign I designed, built, and installed along a highly-trafficked tour corridor at New Belgium Brewery. \n \n The sign shows the occupied status of the quality assurance lab in a fun, stylized way. It is utilized by the employees and enjoyed by the guests. \n \n The \"open\" box rotates to one of four positions based on input from a control panel within the lab, so the sign reads either \"we're open,\" \"we're in a meeting,\" \"we're open for panel,\" or \"we're in training\". The control panel is described in detail in a separate window on my main portfolio page.", PIC, 'sign full.jpg'],
 	['The sign is one of the main features along the tour route. Notice the plexiglass guard to avoid any pinched fingers.', PIC, 'sign hallway.jpg'],
 	['For a fun challenge, I opted out of using microcontrollers to control the sign\'s position. I wanted it to be directed by the control panel, but also the physical position of the box. This way, if someone were to move the box out of place, the motor would engage and rotate until the box returned to its proper position. \n \n The copper pieces forming a diamond shape seen here form a custom four-way sliding switch. Depending on the setting of the control panel, the box rotates around until this switch hits a specific contact. Not visible are embedded skateboard bearings riding around the pipe for a smooth rotation.', PIC, 'sign contacts.jpg'],
 	['A view of the motor, connected with gears and bike chains to the rotating box. New Belgium is all about the bikes.', PIC, 'sign motor.jpg'],
@@ -1059,7 +1059,7 @@ var software = new group("software", 2,1,0,1,1,2,2);
 
 var sensory = [
 	["Automated reporting program for New Belguim Brewery.", PIC, 'rm graphic.jpg'],
-	["I created a powerful, multi-featured program for New Belgium Brewery to track and mine their beer tasters' data. \n \n This program helped my clients in four major ways: \n \n \t 1. Time saving tools. \n \t 2. In-depth analyses. \n \t 3. Flexibility. \n \t 4. Data Integrity. \n \n The following pictures describe these features and benefits in greater detail. \n \n Here you can see the program's home screen.", PIC, 'rm home.jpg'],
+	["I created a powerful, multi-featured program for New Belgium Brewery to track and mine their beer tasters' data. \n \n This program helped my clients in four major ways: \n \n \t 1. Time saving tools. \n \t 2. In-depth analyses. \n \t 3. Flexibility. \n \t 4. Data Integrity. \n \n Here you can see the program's home screen. \n \n The following pictures describe these features and benefits in greater detail.", PIC, 'rm home.jpg'],
 	["1. Time saving tools. \n \n This program automates a substantial amount of data entry, manipulation, and reporting. \n \n Their quarterly panelist reports are a particularly great example of time savings. Generating quarterly reports for all of their beer tasters previously required 100 hours of overtime spent copying, pasting, and resetting of various filters for each taster. With my program, this once monumental task now takes minutes. \n \n This is the form used to create the reports. Each setting, filter, and option gives them added flexibility without any added time.", PIC, 'rm trimester.jpg'],
 	["2. In-depth analyses. \n \n On top of automating existing reports, I designed several new reports that have helped my clients better understand their data and improve their training methods. \n \n This particular report compares performance between two different groups. Various filters narrow the analysis to any specific combination of tasters, dates, or locations to name a few. This helps them to compare any variable to another within their data.", PIC, 'rm filters.jpg'],
 	["3. Flexibility. \n \n All of the reports and tools within the program are designed with flexibility in mind. This way, they can adjust any setting to fit their dynamic needs or requests. \n \n Additionally, I designed the program to work with their previous methods of storing data, so it includes a feature to import date-filtered ranges of data from specific sources. They can choose exactly which data to import at any given time, which keeps things flexible and running smoothly.", PIC, 'rm import.jpg'],
@@ -1074,7 +1074,7 @@ var snowboard = [
 ];
 
 var wavtabler = [
-	["Wave table maker for digital synth. \n \n I created this JavaScript app for my digital synthesizer (shown on the main page). \n \n This app lets you open an audio file and select a specific portion of it to copy as a wave table (an array that stores the samples for one full wave cycle). The selected portion of the original file is resampled for the selected table size and normalized. \n \n  The download button outputs a binary file of the wave table that I can load directly onto my synthesizer's microSD card. \n \n Note: this version works best with <15 second sound snippets.", PIC, 'wave graphic.jpg'],
+	["Wave table maker for digital synth. \n \n I created this JavaScript app for my digital synthesizer (shown on the main page). \n \n This app lets you open an audio file and select a specific portion of it to copy as a wave table (an array that stores the samples for one full wave cycle). The selected portion of the original file is resampled for the selected table size and normalized. \n \n  The download button outputs a binary file of the wave table that I can load directly onto my synthesizer's microSD card. \n \n Note: this version works best with <15 second sound snippets, and I have pre-loaded a short clip for convenience.", PIC, 'wave graphic.jpg'],
 	['https://danchristensendesign.github.io/waveTableMaker/', LINK, 'Try it' ]
 ];
 
@@ -1146,7 +1146,7 @@ var arrange = [
 ];
 
 var instruments = [
-	["Other than my synthesizer, I've built a guitar, harp, and ukulele. I love that creating instruments requires equal parts mathematics, craftsmanship, and an eye for aesthetics.", PIC, 'instruments graphic.jpg'],
+	["Along with my synthesizer, I've built a guitar, harp, and ukulele. I love that creating instruments requires equal parts mathematics, craftsmanship, and an eye for aesthetics.", PIC, 'instruments graphic.jpg'],
 	["Small harp. \n \n This was a fun project. I enjoyed calculating and mapping out the string lengths for each note and seeing them come together to naturally form the harp neck's curvature.", PIC, 'dan harp.jpg'],
 	['Ukulele shaped like a cello. \n \n Rather than bending the sides with steam, I hollowed out a solid piece of wood for the body.', PIC, 'ukulele.jpg']
 ];
