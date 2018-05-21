@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html>
+
+<link href="https://fonts.googleapis.com/css?family=Roboto:900" rel="stylesheet">
+
+<script>
+
+
+var screenR = 4/3;
+var margin = 30;
+//var headerT = 10;
+
+var notHovered = .8;
+var grpScale = 3;
+var hovered = .5;
+var itemScale = 2;
+
+var groupCols = 2;
+var groupRows = 2;
+
+var dataBorder = 15;
+var thumbW = 100;
+var thumbH = 50;
+var thumbSpc = 10;
+var textOff  = 5;
+
+var famFont = 'px Arial';
+var itemFont = 25;//"25px Roboto:300"; 
+var itemTextFill = 'RGB(255,255,255)';
+var groupFont = 60;//"60px Roboto:900";
+var groupTextFill = 'RGB(255,255,255)';
+
+var thumbBoxFill = 'RGB(255, 100,100)';
+var thumbTextFill = 'RGB(255,255,255)';
+var thumbFont = 15;//"15px Roboto:300";
+
+var textFont = 20;
+var lettersPer = .104;
+var lettHt = 22;
+
+var headerHt = 90;
+var footerHt = 90;
+var bottHt = 50;
+var bigMult = 2;
+
+var colors = [
+	[178,84,32],
+	[46,78,55],
+	[8,80,65],
+	[200,70,39],
+	[176,68,39],
+	[176,50,47],
+	[241,75,7]
+];
+
+</script>
+
+
+
+<body>
+
+
+<div id="canvDiv" class="unselectable" style="position:absolute;">
+	<canvas id="backCanv" style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
+	<canvas id="midCanv" style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
+	<canvas id="frontCanv" oncontextmenu="return false;" style="position: absolute; left: 0; top: 0; z-index: 2;"></canvas>	
+	<a id='dummy' style="visibility: hidden"</a>
+</div>
+
+<div id="textDiv" class="unselectable" style="position:absolute;"></div>
+
+<!-- <div id="opts3Div" class="unselectable" style="position:absolute; text-vertical-align:middle;"> 
+	save as <input type="text" id="fName"> </input> <button type="button" id="download" onclick="download();"> download </button><br><br>
+	<button type="button" id="synths" onclick="downloadSynths();"> download basic wave: </button>	
+	<input type="radio" id="header" name="curveInd"  checked> header
+	<input type="radio" id="hardware" name="curveInd" > hardware
+	<input type="radio" id="software" name="curveInd" > software
+	<input type="radio" id="fabrication" name="curveInd"> fabrication
+	<input type="radio" id="music/art" name="curveInd" > footer
+	<input type="radio" id="footer" name="curveInd" > saw Down  <br>
+	<input id="duty"  type="range" min="1" max="100" value="50"></input> duty cycle
+	<a id='dummy' style="visibility: hidden"</a>
+</div> -->
+
+<script>
+
+/* <div id="header"  class="unselectable" style="text-align: center; position:absolute; width: 600; font: 50px Arial; color:powderblue"> Dan Christensen <br></div>
+<div id="headerB" class="unselectable" style="position:absolute; font: 30px Arial; color:powderblue">Engineering and Design</div>
+ */
+const PIC = 0;
+const TEXT = 1;
+const LINK = 2;
+const screenW = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth);
+const screenH = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight);
+const fullW = screenW - 2 * margin;
+const fullH = screenH - 2 * margin;
+
+var squaresW = fullW;
+var squaresH = fullH - headerHt - footerHt;
+const actR = squaresW / squaresH;
+
+if(screenR > actR) squaresH = squaresW / screenR;
+else squaresW = squaresH * screenR;
+
+const screenReduc = squaresH/750;
+groupFont *= screenReduc;
+itemFont *= screenReduc;
+
+var headerT = (screenH - fullH)/2;
+var squaresT = headerT + headerHt;
+var squaresL = (screenW - squaresW)/2;
+var dataFullW = fullW - 2 * dataBorder;
+var dataFullH = fullH - 2 * dataBorder;
+var dataFullL = (screenW - dataFullW)/2;
+var dataFullT = (screenH - dataFullH)/2;
+var dataInnerW = dataFullW - 2 * dataBorder;
+var dataInnerH = dataFullH - 2 * dataBorder;
+var dataInnerL = (screenW - dataInnerW)/2;
+var dataInnerT = (screenH - dataInnerH)/2;
+var dataUseW = dataInnerW - 2 * dataBorder;
+var dataUseH = dataInnerH - 2 * dataBorder;
+var dataButL = (screenW - dataUseW)/2;
+var dataUseT = (screenH - dataUseH)/2;
+
+var dataTextL = dataButL + thumbW + dataBorder;
+var dataTextW = dataUseW - (thumbW + dataBorder);
+var dataTextR = dataTextW/dataUseH;
+var dataBox = dataBorder * 2;
+var boxMidL = dataFullL + dataFullW - dataBorder/2;
+var boxMidT = dataFullT + dataBorder/2;
+var thumbR = thumbW/thumbH;
+var footerT = squaresT + squaresH + dataBorder;
+var footerH = footerHt - dataBorder;
+var footerW = (squaresW - 2 * dataBorder)/3;
+var footerInc = footerW + dataBorder;
+var textMaxArea = dataTextW * dataUseH * .7;
+var curThumbH;
+
+var curScreen = null;
+var lastGroup = null;
+var imageCnt = 0;
+var loaded = 0;
+var blockW = squaresW / groupCols;
+var blockH = squaresH / groupRows;
+var groupArr = [];
+var footer = [];
+initArr(groupArr, groupCols, groupRows);
+
+/* var headerDiv = document.getElementById("header");
+headerDiv.style.left = mainLeft + 'px';
+headerDiv.style.top = headerT + 'px';
+headerDiv.width = squaresW;
+headerDiv.style.align = 'center';
+var headerBDiv = document.getElementById("headerB");
+headerBDiv.style.left = mainLeft + 'px';
+headerBDiv.style.top = margin + 30 + -headerT + 'px'; */
+
+var mainDiv = document.getElementById("canvDiv");
+mainDiv.style.left = 0 + 'px';
+mainDiv.style.top = 0 + 'px';
+
+var backCanv = document.getElementById("backCanv");
+backCanv.width = screenW;
+backCanv.height = screenH;
+var backCx = backCanv.getContext("2d");
+
+var midCanv = document.getElementById("midCanv");
+midCanv.width = screenW;
+midCanv.height = screenH;
+var midCx = midCanv.getContext("2d");
+midCx.textAlign = "center";
+midCx.textBaseline = "bottom";
+midCx.fillStyle = itemTextFill;
+midCx.font = itemFont + famFont;
+
+var frontCanv = document.getElementById("frontCanv");
+frontCanv.width = screenW;
+frontCanv.height = screenH;
+var frontCx = frontCanv.getContext("2d");
+frontCx.textAlign = "center";
+frontCx.textBaseline = "middle";
+frontCx.font = groupFont + famFont;
+var hslInd = 0;
+var colorInd = 0;
+var footerBase = 5;
+var footerCover = 6;
+
+/* var colors = [];
+for(var i = 0; i <= footerCover; i += 1)
+{
+	colors.push(randHSL());
+} */
+
+document.addEventListener("mousemove", updateHover);
+document.addEventListener("mouseup", updateClick);
+document.addEventListener("keydown", keyEvent);
+
+function keyEvent(event)
+{
+	console.log(event.keyCode);
+	switch(event.keyCode)
+	{
+		case 192: colorInd = 0; break; //`
+		case 49: colorInd = 1; break; //1
+		case 50: colorInd = 2; break; //2
+		case 51: colorInd = 3; break; //3
+		case 52: colorInd = 4; break; //4
+		case 53: colorInd = 5; break; //5
+		case 53: colorInd = 6; break; //6
+		case 81: hslInd = 0; break; //q
+		case 87: hslInd = 1; break; //w
+		case 69: hslInd = 2; break;	//e
+		case 65: updateColor(-1); break; //a
+		case 68: updateColor(1); break; //d
+		case 84: spitItOut(); break; //t
+		default:
+		{
+			if(curScreen !== null)
+			{
+				var inc = null;
+				switch (event.keyCode) 
+				{
+					case 37: inc = -1; break; //left	
+					case 38: inc = -1; break; //up	
+					case 39: inc = 1; break; //right	
+					case 40: inc = 1;break; //down	
+					default: return;
+				}
+				
+				thumbInd += inc;
+				if(thumbInd < 0) thumbInd = curScreen.data.length-1;
+				else if(thumbInd >= curScreen.data.length) thumbInd = 0;
+				drawText(thumbInd);
+				drawThumb(true, thumbInd);
+
+			}
+		}
+	}
+}
+document.addEventListener("keydown", updateHSLtoggle);
+document.addEventListener("keyup", updateHSLtoggle);
+var HSLind = -1
+var lastY;
+function updateHSLtoggle(event)
+{
+	HSLind = -1;
+	if(event.type === "keydown")
+	{
+		if(event.key === 'h') HSLind = 0;
+		else if(event.key === 's') HSLind = 1;
+		else if(event.key === 'l') HSLind = 2;
+		else return;
+		lastY = null;
+	}
+		
+	//console.log(event);
+}
+function HSLtoStr(colorInd)
+{
+	//console.log(colorInd);
+	return 'HSL(' + colors[colorInd][0] + ', ' + colors[colorInd][1] + '%, ' + colors[colorInd][2] + '%)';
+}
+function randHSL()
+{
+	return [Math.floor(Math.random() * 255), Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)];
+}
+
+function updateColor(inc)
+{
+	/* var tCol = colors[colorInd][hslInd] + inc;
+	if(hslInd === 0) 
+	{
+		if(tCol > 255) tCol = 0;
+		else if(tCol < 0) tCol = 255;
+	}
+	else
+	{
+		if(tCol > 100) tCol = 100;
+		else if(tCol < 0) tCol = 0;
+	}
+	colors[colorInd][hslInd] = tCol;
+	switch(colorInd)
+	{
+		case 0: drawHeader(); break;
+		case 1: drawGroup(hardware, notHovered);
+		case 2: drawGroup(software, notHovered);
+		case 3: drawGroup(carpentry, notHovered);
+		case 4: drawGroup(art, notHovered);
+		case 5: 
+		case 6: drawFooter(); break;
+	} */
+}
+
+function spitItOut()
+{
+	/* var str = "var colors = [\n\t";
+	var cnt = 0;
+	for(var i = 0; i < colors.length; i+= 1)
+	{
+		str += '[';
+		for(var j = 0; j < 3; j += 1)
+		{
+			str += colors[i][j];
+			if(j < 2) str += ',';
+			else str+= ']';
+		}
+		if(i < colors.length -1) str += ',\n\t'
+		else str += '\n];';
+	}
+	
+	var data = new Blob([str], {type: 'text/plain'});
+	var dummy = document.getElementById('dummy');
+	dummy.href = URL.createObjectURL(data);
+	dummy.download ="colors.txt";
+	dummy.click(); */
+}
+
+
+
+
+
+function group(str, colorInd, col, row, cols, rows, colDivs, rowDivs) 
+{ 
+	this.left = squaresL + blockW * col;
+	this.top = squaresT + blockH * row;
+	this.width = blockW * cols;
+	this.height = blockH * rows;
+	this.halfWidth = this.width/2;
+	this.halfHeight = this.height/2;
+	this.midLeft = this.left + this.halfWidth;
+	this.midTop = this.top + this.halfHeight;
+	this.str = str;
+	this.colorInd = colorInd;
+	this.itemArr = [];
+	initArr(this.itemArr, colDivs, rowDivs);	
+	this.subW = this.width / colDivs;
+	this.subH = this.height / rowDivs;
+	this.cols = colDivs;
+	this.rows = rowDivs;
+	addToArr(this, col, row, cols, rows, groupArr);
+}
+
+function item(group, data, title, col, row, cols, rows) 
+{
+    imageCnt+= 1;
+	this.left = group.left + group.subW * col;
+	this.top = group.top + group.subH * row;
+	this.width = group.subW * cols;
+	this.height = group.subH * rows;
+	this.halfWidth = this.width/2;
+	this.halfHeight = this.height/2;
+	this.midLeft = this.left + this.halfWidth;
+	this.midTop = this.top + this.halfHeight;
+	this.str = title;
+	this.data = data;
+	for(var i = 0; i < data.length; i += 1)
+	{
+		if(data[i][2].search('.jpg') > -1) this.data[i][2] = group.str + ' pics/' + data[i][2];
+	}		
+	this.images = [];
+	this.firstImage = -1;
+	addToArr(this, col, row, cols, rows, group.itemArr); 	
+}
+
+
+function loadAllImages()
+{
+	var grpDone = [];
+	for(var grpCol = 0; grpCol < groupCols; grpCol+= 1)
+	{
+		for(var grpRow = 0; grpRow < groupRows; grpRow+= 1)
+		{
+			var curGrp = groupArr[grpCol][grpRow];
+			if(curGrp != null && !grpDone.includes(curGrp))
+			{
+				var itemDone = [];
+				for(var itemCol = 0; itemCol < curGrp.cols; itemCol+= 1)
+				{
+					for(var itemRow = 0; itemRow < curGrp.rows; itemRow+= 1)
+					{
+						var curItem = curGrp.itemArr[itemCol][itemRow];
+						if(curItem != null && !itemDone.includes(curItem))
+						{
+							loadItemImages(curItem);
+							itemDone.push(curItem);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+function loadItemImages(item)
+{
+	for(var i = 0; i < item.data.length; i += 1)
+	{
+		if(item.data[i][1] !== PIC) item.images.push(null);
+		else
+		{
+			var img = document.createElement("img");
+			if(item.firstImage === -1) 
+			{
+				img.onload = function(){initDrawing()};
+				item.firstImage = i;
+			}
+			img.src = item.data[i][2];
+			item.images.push(img);
+		}
+	}
+}
+
+function drawHeader()
+{
+	backCx.clearRect(squaresL, 0, squaresW, headerT + headerHt);
+	backCx.fillStyle = HSLtoStr(0);
+	backCx.textAlign = 'center';
+	backCx.textBaseline = "top";
+	backCx.font = 60 + famFont;
+	backCx.fillText("Dan Christensen", squaresL + squaresW/2, 0);
+	backCx.textBaseline = "bottom";
+	backCx.font = 30 + famFont;
+	backCx.fillText("Engineering & Design", squaresL + squaresW/2, headerHt + 5);
+}
+
+function drawFooter()
+{
+	frontCx.clearRect(squaresL, footerT, squaresW, footerH);
+	frontCx.globalAlpha = 1;
+	frontCx.textAlign = "center";
+	frontCx.textBaseline = "middle";
+	frontCx.fillStyle = 'RGB(255,255,255)';
+	frontCx.font = itemFont + famFont;
+	backCx.fillStyle = HSLtoStr(footerBase);
+	backCx.globalAlpha = 1;
+	var str = ['contact', 'about me', 'resume'];
+	for(var i = 0; i < 3; i+= 1)
+	{
+		//backCx.fillStyle = 'RGB(95, 205, 183)';
+		backCx.fillRect(squaresL + i*footerInc, footerT, footerW, footerH);	
+		//backCx.fillStyle = groupTextFill;
+		frontCx.fillText(str[i], squaresL + i*footerInc + footerW/2, footerT + footerH/2);
+	}
+	coverFoot();
+}
+
+function initDrawing()
+{
+	loaded += 1;
+	//console.log(imageCnt + ' images... ' + loaded);
+	if(loaded == imageCnt) 
+	{
+		drawHeader();
+		drawFooter();
+		
+		
+		
+		var grpDone = [];
+		for(var grpCol = 0; grpCol < groupCols; grpCol+= 1)
+		{
+			for(var grpRow = 0; grpRow < groupRows; grpRow+= 1)
+			{
+				var curGrp = groupArr[grpCol][grpRow];
+				if(curGrp != null && !grpDone.includes(curGrp))
+				{
+					drawGroup(curGrp, notHovered);
+					grpDone.push(curGrp);
+					var itemDone = [];
+					for(var itemCol = 0; itemCol < curGrp.cols; itemCol+= 1)
+					{
+						for(var itemRow = 0; itemRow < curGrp.rows; itemRow+= 1)
+						{
+							var curItem = curGrp.itemArr[itemCol][itemRow];
+							if(curItem != null && !itemDone.includes(curItem) && curItem.firstImage !== -1)
+							{
+								var reduc = setCrop(curItem);
+								backCx.drawImage(curItem.images[curItem.firstImage], reduc.l, reduc.t, reduc.w, reduc.h, curItem.left, curItem.top, curItem.width, curItem.height);
+								itemDone.push(curItem);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+function setCrop(curItem)
+{
+	var fitR = curItem.width/curItem.height;
+	
+	var w = curItem.images[curItem.firstImage].naturalWidth;
+	var h = curItem.images[curItem.firstImage].naturalHeight;
+	var reduc = {l: 0, t: 0, w: w, h: h};
+	var actR = w/h;
+	if(actR > fitR)
+	{
+		reduc.w = fitR * h;
+		reduc.l = (w - reduc.w)/2;
+	}
+	else
+	{
+		reduc.h = w/fitR;
+		reduc.t = (h - reduc.h)/2;
+	}
+	//console.log("w " + w + ', h ' + h + ', neww ' + reduc.w + ', newh ' + reduc.h + ', sl ' + reduc.l + ', st ' + reduc.t);
+	return reduc;
+}
+	
+
+function reDraw()
+{
+	midCx.clearRect(0,0,screenW, screenH);
+	frontCx.clearRect(0,0,screenW, screenH);
+	coverFoot();
+	var grpDone = [];
+	for(var grpCol = 0; grpCol < groupCols; grpCol+= 1)
+	{
+		for(var grpRow = 0; grpRow < groupRows; grpRow+= 1)
+		{
+			var curGrp = groupArr[grpCol][grpRow];
+			if(curGrp != null && !grpDone.includes(curGrp))
+			{
+				//console.log('drawing ' + curGrp);
+				drawGroup(curGrp, notHovered);
+			}
+		}
+	}
+	drawFooter();
+}
+
+
+function drawGroup(group, pct)
+{				
+	midCx.clearRect(group.left, group.top, group.width, group.height);
+	frontCx.clearRect(group.left, group.top, group.width, group.height);
+	midCx.globalAlpha = pct;
+	midCx.fillStyle = HSLtoStr(group.colorInd);
+	midCx.fillRect(group.left, group.top, group.width, group.height);
+	//console.log(pct);
+	if(pct < notHovered) frontCx.globalAlpha = pct - hovered;
+	else frontCx.globalAlpha = 1;
+	frontCx.textAlign = "center";
+	frontCx.textBaseline = "middle";
+	frontCx.font = groupFont + famFont;
+	frontCx.fillStyle = groupTextFill;
+	frontCx.fillText(group.str, group.midLeft, group.midTop);
+}
+
+function getGroupItem(event)
+{
+	var x = event.clientX- squaresL;
+	var y = event.clientY - squaresT;
+	var pair = {group: null, item: null};
+	var outCol = x/blockW;
+	var outRow = y/blockH;
+	if(outCol >= 0 && outCol < groupCols && outRow >= 0 && outRow < groupRows)
+	{
+		var indX = Math.floor(outCol);
+		var indY = Math.floor(outRow);
+		pair.group = groupArr[indX][indY];
+		if(pair.group != null)
+		{
+			pair.item = pair.group.itemArr[Math.floor((outCol - indX) * pair.group.cols)][Math.floor((outRow - indY) * pair.group.rows)];
+		}
+	}
+	else if(x >= 0 && x <= squaresW && y >= squaresH && y <= squaresH + footerH)
+		pair.group = Math.floor(x/squaresW * 3);
+	
+	//console.log(typeof(pair.group));
+	return pair;
+}
+
+function coverFoot()
+{
+	midCx.clearRect(squaresL, footerT, squaresW, footerH);
+	midCx.fillStyle = HSLtoStr(footerCover);
+	midCx.globalAlpha = .4;
+	for(var i = 0; i < 3; i+= 1)
+	{
+		midCx.fillRect(squaresL + i*footerInc, footerT, footerW, footerH);	
+	}
+}
+
+function updateHover(event)
+{
+	if(curScreen == null)
+	{
+		coverFoot();
+		var pair = getGroupItem(event);
+		if(pair.group != null)
+		{
+			if(typeof(pair.group) === "number") midCx.clearRect(squaresL + pair.group * footerInc, footerT, footerW, footerH);
+			else
+			{
+				var grpPct = Math.min(notHovered, Math.max(getPct(event, pair.group, grpScale), hovered));
+				drawGroup(pair.group, grpPct);
+				if(pair.item != null)
+				{
+					var itemPct = getPct(event, pair.item, itemScale);
+					midCx.clearRect(pair.item.left, pair.item.top, pair.item.width, pair.item.height);
+					//midCx.globalAlpha = grpPct * itemPct;
+					//midCx.fillRect(pair.item.left, pair.item.top, pair.item.width, pair.item.height);
+					frontCx.globalAlpha = 1;
+					frontCx.textAlign = "center";
+					frontCx.textBaseline = "bottom";
+					frontCx.font = itemFont + famFont;
+					//frontCx.fillStyle = 'RGB(0,0,0)';
+
+					var off = 1.5;
+					/* frontCx.fillText(pair.item.str, pair.item.midLeft-off, pair.item.top-2*off + pair.item.height);
+					frontCx.fillText(pair.item.str, pair.item.midLeft-off, pair.item.top + pair.item.height);
+					frontCx.fillText(pair.item.str, pair.item.midLeft+off, pair.item.top-2*off + pair.item.height);
+					frontCx.fillText(pair.item.str, pair.item.midLeft+off, pair.item.top + pair.item.height); */
+					//frontCx.fillText(pair.item.str, pair.item.midLeft-off, pair.item.top-off + pair.item.height);
+					frontCx.fillStyle = itemTextFill;
+					frontCx.fillText(pair.item.str, pair.item.midLeft, pair.item.top-off + pair.item.height);	
+				}
+			}
+		}
+		
+		//if the group changed, update the previous
+		if(lastGroup !== null && lastGroup !== pair.group && typeof(lastGroup) !== 'number')
+		{
+			//console.log(lastGroup);
+			drawGroup(lastGroup, notHovered);
+		}
+		lastGroup = pair.group;
+	}
+	else drawThumb(true, getThumbInd(event));
+
+}
+
+function getThumbInd(event)
+{
+	var x = event.clientX - dataInnerL;
+	var y = event.clientY - dataInnerT;
+	//console.log(x + ', ' + y);
+	var ind;
+	if(x < 0 || x > dataInnerW || y < 0 || y > dataInnerH) return -2;
+	var ind = (y -thumbSpc/2)/(curThumbH + thumbSpc);
+	if(x > thumbW + 2* dataBorder) ind = -1;
+	
+	return Math.floor(ind);
+	
+}
+
+function updateClick(event)
+{
+	
+	if(curScreen == null)
+	{
+		var pair = getGroupItem(event);
+		if(typeof(pair.group) === "number")
+		{
+			if(pair.group === 2) window.open(resume, );
+			else
+			{
+				curScreen = footer[pair.group];
+				drawItemScreen(true);
+			}
+		}
+		else if(pair.item != null)
+		{
+			thumbInd = 0;
+			curScreen = pair.item;
+			drawItemScreen(true);
+		}
+	}
+	else
+	{
+		ind = getThumbInd(event);
+		if(ind == -2)
+		{
+			console.log('out');
+			curScreen = null;
+			reDraw();
+			updateHover(event);
+		}
+		else 
+		{
+			drawText(ind);
+		}
+	}
+}
+
+
+
+function drawItemScreen(isNew)
+{
+	frontCx.clearRect(dataFullL, dataFullT, dataFullW, dataFullH);
+	midCx.fillStyle = 'RGB(0,0,0)';
+	midCx.globalAlpha = .6;
+	midCx.fillRect(dataFullL, dataFullT, dataFullW, dataFullH);
+	midCx.globalAlpha = 1;
+	
+	midCx.fillStyle = 'RGB(255,255,255)';
+	midCx.fillRect(dataInnerL, dataInnerT, dataInnerW, dataInnerH);
+
+	frontCx.fillStyle = 'RGB(255,255,255)';
+	frontCx.globalAlpha = 1;
+	frontCx.textAlign = 'center';
+	frontCx.textBaseline = "middle";
+	frontCx.font = itemFont + famFont;
+	frontCx.fillText('X', boxMidL, boxMidT);
+	
+	if(isNew)
+	{
+		var thumbNow = curScreen.data.length * (thumbH + thumbSpc);
+		if(thumbNow > dataUseH) curThumbH = dataUseH/curScreen.data.length - thumbSpc;
+		else curThumbH = thumbH;
+		thumbR = thumbW/curThumbH;
+		
+		for(var i = 0; i < curScreen.data.length; i += 1)
+		{
+			drawThumb(false, i);
+		}
+		drawThumb(true, -1);
+		drawText(0);
+	}
+}
+
+function drawText(ind)
+{
+	if(ind < 0 || ind >= curScreen.data.length) return;
+	thumbInd = ind;
+	if(curScreen.data[ind][1] === LINK) 
+	{
+		window.open(curScreen.data[ind][0], );
+		return;
+	}
+	
+	frontCx.clearRect(dataTextL, dataUseT , dataTextW, dataUseH);
+	frontCx.globalAlpha = 1;
+	var textIncX = 0;
+	var textIncY = 0;
+	if(curScreen.images.length && curScreen.images[ind] !== null) 
+	{
+		var size = getBoundSize(curScreen.images[ind], dataTextR, dataTextW, dataUseH);
+		if(size.w === dataTextW) textIncY = size.h;
+		else textIncX = size.w;
+		
+		if(curScreen.data[ind][0].length > 20)
+		{
+			var mult = size.w * size.h / textMaxArea;
+			if(mult > 1)
+			{
+				size.w /= mult;
+				size.h /= mult;
+				textIncX /= mult;
+				textIncY /= mult;
+			}
+		}
+		
+		frontCx.drawImage(curScreen.images[ind], dataTextL, dataUseT, size.w, size.h);
+		
+			
+	}
+	
+	var letters = (dataTextW - (textIncX + textOff)) * lettersPer;
+	var ht = lettHt
+	var fSize = textFont;
+	
+	if(curScreen.data[ind][2] === 'big')
+	{
+		letters /= bigMult;
+		ht *= bigMult;
+		fSize *= bigMult;
+	}
+	
+	var approxLines =  Math.floor(curScreen.data[ind][0].length / (letters - 7));
+	approxLines +=  (curScreen.data[ind][0].split('\n').length-1);
+	var approxH = approxLines * ht;
+	
+	if(approxH > (dataUseH - textIncY - textOff))
+	{
+		var mult = Math.pow((dataUseH - textIncY - textOff)/approxH, .5);
+		letters /= mult;
+		ht *= mult;
+		fSize *= mult;
+	}
+	
+	frontCx.fillStyle = 'RGB(0,0,0)';
+	
+	frontCx.textAlign = 'left';
+	frontCx.textBaseline = "top";
+	frontCx.font = fSize + famFont;
+	textIncY += (dataUseT + textOff);
+	textIncX += (dataTextL + textOff);
+	
+	
+	var words = curScreen.data[ind][0].split(' ');
+	var curStr = "";
+	for(var i = 0; i < words.length; i += 1)
+	{
+		if((curStr.length + words[i].length + 1) > letters || words[i] === '\n')
+		{
+			frontCx.fillText(curStr, textIncX, textIncY);
+			curStr = "";
+			textIncY += ht;
+		}
+		else if(curStr !== "") curStr += " ";
+		if(words[i] !== '\n') curStr += words[i];
+	}
+	if(curStr !== " ") frontCx.fillText(curStr, textIncX, textIncY);
+}
+
+function drawThumb(isHighLight, ind)
+{
+	var curTop;
+	
+	midCx.globalAlpha = 1;
+	if(ind == -2) midCx.fillStyle = 'RGB(255,0,0)';
+	else midCx.fillStyle = HSLtoStr(0);//'RGB(95, 205, 183)';
+	midCx.fillRect(boxMidL - dataBox/2, boxMidT - dataBox/2, dataBox, dataBox);
+	if(ind >= 0 && ind < curScreen.data.length)
+	{
+		curTop = dataUseT + ind * (curThumbH + thumbSpc);
+	}
+	else if(!isHighLight) return;
+	
+	if(isHighLight && lastGroup !== ind)
+	{
+		frontCx.clearRect(dataButL, dataUseT, thumbW, dataUseH);
+		frontCx.globalAlpha = .3;
+		frontCx.fillStyle = 'RGB(255,255,255)';
+		frontCx.fillRect(dataButL, dataUseT, thumbW, dataUseH);
+		frontCx.clearRect(dataButL, dataUseT + ind * (curThumbH + thumbSpc), thumbW, curThumbH);
+		//frontCx.clearRect(boxMidL - dataBox/2, boxMidT - dataBox/2, dataBox, dataBox);
+		if(ind >= 0 && ind < curScreen.data.length)
+			frontCx.clearRect(dataButL, curTop, thumbW, curThumbH);
+		lastGroup = ind;
+		return;
+	}
+	
+	else if(ind < 0 || ind >= curScreen.data.length) return;
+	var size = {w: thumbW, h: curThumbH};	
+	midCx.globalAlpha = 1;
+	if(curScreen.images.length && curScreen.images[ind] !== null)
+	{	
+		size = getBoundSize(curScreen.images[ind], thumbR, thumbW, curThumbH);
+		midCx.drawImage(curScreen.images[ind], dataButL + thumbW - size.w, curTop, size.w, size.h);
+	}
+	else if(curScreen.data[ind][2] !== '' && curScreen.data[ind][2] !== 'big')
+	{
+		midCx.fillStyle = thumbBoxFill;
+		midCx.fillRect(dataButL, curTop, size.w, size.h);
+		midCx.fillStyle = thumbTextFill;
+		midCx.textAlign = "center";
+		midCx.textBaseline = "middle";
+		midCx.font = thumbFont + famFont;
+		midCx.fillText(curScreen.data[ind][2], dataButL + size.w/2, curTop + size.h/2);
+	}
+	
+}
+
+
+
+function getBoundSize(img, frameR, maxW, maxH)
+{
+	var size = {w: 0, h: 0};
+	var r = img.naturalWidth/ img.naturalHeight;
+	if(r > frameR) 
+	{
+		size.w = maxW
+		size.h = maxW / r;
+	}
+	else
+	{
+		size.h = maxH;
+		size.w = maxH * r;
+	}
+	return size;
+}
+	
+function getPct(event, obj, scale)
+{
+	return Math.pow(Math.max(Math.abs((event.clientX - obj.midLeft)/obj.halfWidth), Math.abs((event.clientY - obj.midTop)/obj.halfHeight)), scale);
+}
+
+function initArr(arr, cols, rows)
+{
+	for(var colInd = 0; colInd < cols; colInd += 1)
+	{
+		var tArr = [];
+		for(var rowInd = 0; rowInd < rows; rowInd += 1)
+		{
+			tArr.push(null);
+		}
+		arr.push(tArr);
+	}
+}
+
+function addToArr(obj, baseCol, baseRow, cols, rows, arr)
+{
+	for(var colInd = 0; colInd < cols; colInd += 1)
+	{
+		for(var rowInd = 0; rowInd < rows; rowInd += 1)
+		{
+			arr[baseCol + colInd][baseRow + rowInd] = obj;
+		}
+	}
+}
+
+</script>
+
+<script type="text/javascript" src="footer.js"></script>
+<script type="text/javascript" src="hardware.js"></script>
+<script type="text/javascript" src="software.js"></script>
+<script type="text/javascript" src="carpentry.js"></script>
+<script type="text/javascript" src="art.js"></script>
+<script>
+
+/* var lettersPer = synth[1][0].length/dataTextW;
+console.log(synth[1][0].length + ', ' + lettersPer + ', let'); */
+
+
+
+loadAllImages(); 
+</script>
+ 
+
+</html> 
