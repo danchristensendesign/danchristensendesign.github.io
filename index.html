@@ -65,12 +65,32 @@ var bigMult = 2;
 
 var colors = [
 	[210,84,32],
-	[191,63,41],
-	[153,56,48],
-	[172,78,43],
-	[187,63,51],
-	[176,50,47],
+	[191,100,26],
+	[153,25,26],
+	[172,9,49],
+	[40,63,39],
+	[185,100,29],
+	[34,100,29]
+];
+
+/* var colors = [
+	[210,84,32],
+	[191,0,33],
+	[153,0,47],
+	[172,0,49],
+	[187,0,55],
+	[176,0,47],
 	[241,75,7]
+]; */
+
+var colors = [
+	[210,84,32],
+	[191,100,26],
+	[153,13,31],
+	[172,9,49],
+	[40,63,39],
+	[185,100,29],
+	[34,100,29]
 ];
 
 </script>
@@ -226,7 +246,7 @@ function keyEvent(event)
 		case 51: colorInd = 3; break; //3
 		case 52: colorInd = 4; break; //4
 		case 53: colorInd = 5; break; //5
-		case 53: colorInd = 6; break; //6
+		case 54: colorInd = 6; break; //6
 		case 81: hslInd = 0; break; //q
 		case 87: hslInd = 1; break; //w
 		case 69: hslInd = 2; break;	//e
@@ -251,7 +271,7 @@ function keyEvent(event)
 				if(thumbInd < 0) thumbInd = curScreen.data.length-1;
 				else if(thumbInd >= curScreen.data.length) thumbInd = 0;
 				drawText(thumbInd);
-				drawThumb(true, thumbInd);
+				drawThumbHighlight(thumbInd);
 
 			}
 		}
@@ -492,7 +512,7 @@ function initDrawing()
 			for(var grpRow = 0; grpRow < groupRows; grpRow+= 1)
 			{
 				var curGrp = groupArr[grpCol][grpRow];
-				if(curGrp != null && !grpDone.includes(curGrp))
+				if(curGrp != null && !includes(curGrp, grpDone))
 				{
 					drawGroup(curGrp, notHovered);
 					grpDone.push(curGrp);
@@ -502,7 +522,7 @@ function initDrawing()
 						for(var itemRow = 0; itemRow < curGrp.rows; itemRow+= 1)
 						{
 							var curItem = curGrp.itemArr[itemCol][itemRow];
-							if(curItem != null && !itemDone.includes(curItem) && curItem.firstImage !== -1)
+							if(curItem != null && !includes(curItem, itemDone) && curItem.firstImage !== -1)
 							{
 								var reduc = setCrop(curItem);
 								backCx.drawImage(curItem.images[curItem.firstImage], reduc.l, reduc.t, reduc.w, reduc.h, curItem.left, curItem.top, curItem.width, curItem.height);
@@ -619,6 +639,15 @@ function updateHover(event)
 	{
 		coverFoot();
 		var pair = getGroupItem(event);
+		
+		//if the group changed, update the previous
+		if(lastGroup !== null && lastGroup !== pair.group && typeof(lastGroup) !== 'number')
+		{
+			//console.log(lastGroup);
+			drawGroup(lastGroup, notHovered);
+		}
+		lastGroup = pair.group;
+		
 		if(pair.group != null)
 		{
 			if(typeof(pair.group) === "number") midCx.clearRect(squaresL + pair.group * footerInc, footerT, footerW, footerH);
@@ -650,15 +679,9 @@ function updateHover(event)
 			}
 		}
 		
-		//if the group changed, update the previous
-		if(lastGroup !== null && lastGroup !== pair.group && typeof(lastGroup) !== 'number')
-		{
-			//console.log(lastGroup);
-			drawGroup(lastGroup, notHovered);
-		}
-		lastGroup = pair.group;
+		
 	}
-	else drawThumb(true, getThumbInd(event));
+	else drawThumbHighlight(getThumbInd(event));
 
 }
 
@@ -742,12 +765,9 @@ function drawItemScreen(isNew)
 		else curThumbH = thumbH;
 		thumbR = thumbW/curThumbH;
 		
-		for(var i = 0; i < curScreen.data.length; i += 1)
-		{
-			drawThumb(false, i);
-		}
-		drawThumb(true, -1);
+		drawThumbs();
 		drawText(0);
+		drawThumbHighlight(0);
 	}
 }
 
@@ -836,56 +856,55 @@ function drawText(ind)
 	if(curStr !== " ") frontCx.fillText(curStr, textIncX, textIncY);
 }
 
-function drawThumb(isHighLight, ind)
+function drawThumbHighlight(ind)
 {
-	var curTop;
-	
-	midCx.globalAlpha = 1;
-	if(ind == -2) midCx.fillStyle = 'RGB(255,0,0)';
-	else midCx.fillStyle = HSLtoStr(0);//'RGB(95, 205, 183)';
-	midCx.fillRect(boxMidL - dataBox/2, boxMidT - dataBox/2, dataBox, dataBox);
-	if(ind >= 0 && ind < curScreen.data.length)
+	if(lastGroup !== ind)
 	{
+		//reset x box
+		midCx.globalAlpha = 1;
+		if(ind == -2) midCx.fillStyle = 'RGB(255,0,0)';
+		else midCx.fillStyle = HSLtoStr(0);
+		midCx.fillRect(boxMidL - dataBox/2, boxMidT - dataBox/2, dataBox, dataBox);
+		
 		curTop = dataUseT + ind * (curThumbH + thumbSpc);
-	}
-	else if(!isHighLight) return;
-	
-	if(isHighLight && lastGroup !== ind)
-	{
 		frontCx.clearRect(dataButL, dataUseT, thumbW, dataUseH);
-		frontCx.globalAlpha = .3;
+		frontCx.globalAlpha = .4;
 		frontCx.fillStyle = 'RGB(255,255,255)';
-		frontCx.fillRect(dataButL, dataUseT, thumbW, dataUseH);
-		frontCx.clearRect(dataButL, dataUseT + ind * (curThumbH + thumbSpc), thumbW, curThumbH);
-		//frontCx.clearRect(boxMidL - dataBox/2, boxMidT - dataBox/2, dataBox, dataBox);
+		//frontCx.fillRect(dataButL, dataUseT, thumbW, dataUseH);
+		frontCx.fillRect(dataButL, dataUseT + thumbInd * (curThumbH + thumbSpc), thumbW, curThumbH);
 		if(ind >= 0 && ind < curScreen.data.length)
-			frontCx.clearRect(dataButL, curTop, thumbW, curThumbH);
+		{
+			frontCx.fillRect(dataButL, dataUseT + ind * (curThumbH + thumbSpc), thumbW, curThumbH);
+		}
 		lastGroup = ind;
-		return;
 	}
-	
-	else if(ind < 0 || ind >= curScreen.data.length) return;
-	var size = {w: thumbW, h: curThumbH};	
-	midCx.globalAlpha = 1;
-	if(curScreen.images.length && curScreen.images[ind] !== null)
-	{	
-		size = getBoundSize(curScreen.images[ind], thumbR, thumbW, curThumbH);
-		midCx.drawImage(curScreen.images[ind], dataButL + thumbW - size.w, curTop, size.w, size.h);
-	}
-	else if(curScreen.data[ind][2] !== '' && curScreen.data[ind][2] !== 'big')
+}
+
+function drawThumbs()
+{
+	for(var ind = 0; ind < curScreen.data.length; ind += 1)
 	{
-		midCx.fillStyle = thumbBoxFill;
-		midCx.fillRect(dataButL, curTop, size.w, size.h);
-		midCx.fillStyle = thumbTextFill;
-		midCx.textAlign = "center";
-		midCx.textBaseline = "middle";
-		midCx.font = thumbFont + famFont;
-		midCx.fillText(curScreen.data[ind][2], dataButL + size.w/2, curTop + size.h/2);
+		var curTop = dataUseT + ind * (curThumbH + thumbSpc);
+		var size = {w: thumbW, h: curThumbH};	
+		midCx.globalAlpha = 1;
+		if(curScreen.data[ind][1] === PIC && curScreen.images[ind] !== null)
+		{	
+			size = getBoundSize(curScreen.images[ind], thumbR, thumbW, curThumbH);
+			midCx.drawImage(curScreen.images[ind], dataButL + thumbW - size.w, curTop, size.w, size.h);
+		}
+		else if(curScreen.data[ind][2] !== '' && curScreen.data[ind][2] !== 'big')
+		{
+			midCx.fillStyle = thumbBoxFill;
+			midCx.fillRect(dataButL, curTop, size.w, size.h);
+			midCx.fillStyle = thumbTextFill;
+			midCx.textAlign = "center";
+			midCx.textBaseline = "middle";
+			midCx.font = thumbFont + famFont;
+			midCx.fillText(curScreen.data[ind][2], dataButL + size.w/2, curTop + size.h/2);
+		}
 	}
 	
 }
-
-
 
 function getBoundSize(img, frameR, maxW, maxH)
 {
