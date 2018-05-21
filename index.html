@@ -86,12 +86,22 @@ var colors = [
 var colors = [
 	[210,84,32],
 	[191,100,26],
+	[153,6,31],
+	[172,0,64],
+	[40,63,39],
+	[172,93,29],
+	[34,40,29]
+];
+
+/* var colors = [
+	[210,84,32],
+	[191,100,26],
 	[153,13,31],
-	[172,9,49],
+	[172,0,64],
 	[40,63,39],
 	[185,100,29],
-	[34,100,29]
-];
+	
+]; */
 
 </script>
 
@@ -142,13 +152,18 @@ const actR = squaresW / squaresH;
 if(screenR > actR) squaresH = squaresW / screenR;
 else squaresW = squaresH * screenR;
 
+var blockW = Math.floor(squaresW / groupCols);
+var blockH = Math.floor(squaresH / groupRows);
+squaresW = blockW * groupCols;//Math.floor(squaresW);
+squaresH = blockH * groupRows;//Math.floor(squaresH);
+
 const screenReduc = squaresH/750;
 groupFont *= screenReduc;
 itemFont *= screenReduc;
 
 var headerT = (screenH - fullH)/2;
-var squaresT = headerT + headerHt;
-var squaresL = (screenW - squaresW)/2;
+var squaresT = Math.floor(headerT + headerHt);
+var squaresL = Math.floor((screenW - squaresW)/2);
 var dataFullW = fullW - 2 * dataBorder;
 var dataFullH = fullH - 2 * dataBorder;
 var dataFullL = (screenW - dataFullW)/2;
@@ -180,8 +195,7 @@ var curScreen = null;
 var lastGroup = null;
 var imageCnt = 0;
 var loaded = 0;
-var blockW = squaresW / groupCols;
-var blockH = squaresH / groupRows;
+
 var groupArr = [];
 var footer = [];
 initArr(groupArr, groupCols, groupRows);
@@ -667,14 +681,14 @@ function updateHover(event)
 					frontCx.font = itemFont + famFont;
 					//frontCx.fillStyle = 'RGB(0,0,0)';
 
-					var off = 1.5;
+					//var off = 1.5;
 					/* frontCx.fillText(pair.item.str, pair.item.midLeft-off, pair.item.top-2*off + pair.item.height);
 					frontCx.fillText(pair.item.str, pair.item.midLeft-off, pair.item.top + pair.item.height);
 					frontCx.fillText(pair.item.str, pair.item.midLeft+off, pair.item.top-2*off + pair.item.height);
 					frontCx.fillText(pair.item.str, pair.item.midLeft+off, pair.item.top + pair.item.height); */
 					//frontCx.fillText(pair.item.str, pair.item.midLeft-off, pair.item.top-off + pair.item.height);
 					frontCx.fillStyle = itemTextFill;
-					frontCx.fillText(pair.item.str, pair.item.midLeft, pair.item.top-off + pair.item.height);	
+					frontCx.fillText(pair.item.str, pair.item.midLeft, pair.item.top + pair.item.height);	
 				}
 			}
 		}
@@ -955,7 +969,7 @@ function addToArr(obj, baseCol, baseRow, cols, rows, arr)
 //footer...................................................................................
 var contact = {
 	data: [
-	['contact info: \n \n \n email    danchristensendesign@gmail.com \n \n cell       605-890-0628', TEXT, 'big']],
+	['contact info: \n \n \n email    danchristensendesign@gmail.com \n \n cell       605-890-0628', TEXT, '']],
 	images: []
 };
 
