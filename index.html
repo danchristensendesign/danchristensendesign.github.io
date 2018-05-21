@@ -10,7 +10,7 @@ var screenR = 4/3;
 var margin = 30;
 //var headerT = 10;
 
-var notHovered = .8;
+var notHovered = .94;
 var grpScale = 3;
 var hovered = .5;
 var itemScale = 2;
@@ -43,12 +43,32 @@ var footerHt = 90;
 var bottHt = 50;
 var bigMult = 2;
 
-var colors = [
+/* var colors = [
 	[178,84,32],
 	[46,78,55],
 	[8,80,65],
 	[200,70,39],
 	[176,68,39],
+	[176,50,47],
+	[241,75,7]
+]; */
+
+/* var colors = [
+	[210,84,32],
+	[224,22,61],
+	[176,19,46],
+	[175,60,40],
+	[192,49,62],
+	[176,50,47],
+	[241,75,7]
+]; */
+
+var colors = [
+	[210,84,32],
+	[191,63,41],
+	[153,56,48],
+	[172,78,43],
+	[187,63,51],
 	[176,50,47],
 	[241,75,7]
 ];
@@ -267,7 +287,7 @@ function randHSL()
 
 function updateColor(inc)
 {
-	/* var tCol = colors[colorInd][hslInd] + inc;
+	var tCol = colors[colorInd][hslInd] + inc;
 	if(hslInd === 0) 
 	{
 		if(tCol > 255) tCol = 0;
@@ -288,12 +308,12 @@ function updateColor(inc)
 		case 4: drawGroup(art, notHovered);
 		case 5: 
 		case 6: drawFooter(); break;
-	} */
+	}
 }
 
 function spitItOut()
 {
-	/* var str = "var colors = [\n\t";
+	var str = "var colors = [\n\t";
 	var cnt = 0;
 	for(var i = 0; i < colors.length; i+= 1)
 	{
@@ -312,7 +332,7 @@ function spitItOut()
 	var dummy = document.getElementById('dummy');
 	dummy.href = URL.createObjectURL(data);
 	dummy.download ="colors.txt";
-	dummy.click(); */
+	dummy.click();
 }
 
 
