@@ -257,7 +257,7 @@ function updateHSLtoggle(event)
 }
 function HSLtoStr(colorInd)
 {
-	console.log(colorInd);
+	//console.log(colorInd);
 	return 'HSL(' + colors[colorInd][0] + ', ' + colors[colorInd][1] + '%, ' + colors[colorInd][2] + '%)';
 }
 function randHSL()
@@ -267,7 +267,7 @@ function randHSL()
 
 function updateColor(inc)
 {
-	var tCol = colors[colorInd][hslInd] + inc;
+	/* var tCol = colors[colorInd][hslInd] + inc;
 	if(hslInd === 0) 
 	{
 		if(tCol > 255) tCol = 0;
@@ -288,12 +288,12 @@ function updateColor(inc)
 		case 4: drawGroup(art, notHovered);
 		case 5: 
 		case 6: drawFooter(); break;
-	}
+	} */
 }
 
 function spitItOut()
 {
-	var str = "var colors = [\n\t";
+	/* var str = "var colors = [\n\t";
 	var cnt = 0;
 	for(var i = 0; i < colors.length; i+= 1)
 	{
@@ -312,7 +312,7 @@ function spitItOut()
 	var dummy = document.getElementById('dummy');
 	dummy.href = URL.createObjectURL(data);
 	dummy.download ="colors.txt";
-	dummy.click();
+	dummy.click(); */
 }
 
 
@@ -447,7 +447,7 @@ function drawFooter()
 function initDrawing()
 {
 	loaded += 1;
-	console.log(imageCnt + ' images... ' + loaded);
+	//console.log(imageCnt + ' images... ' + loaded);
 	if(loaded == imageCnt) 
 	{
 		drawHeader();
@@ -503,7 +503,7 @@ function setCrop(curItem)
 		reduc.h = w/fitR;
 		reduc.t = (h - reduc.h)/2;
 	}
-	console.log("w " + w + ', h ' + h + ', neww ' + reduc.w + ', newh ' + reduc.h + ', sl ' + reduc.l + ', st ' + reduc.t);
+	//console.log("w " + w + ', h ' + h + ', neww ' + reduc.w + ', newh ' + reduc.h + ', sl ' + reduc.l + ', st ' + reduc.t);
 	return reduc;
 }
 	
@@ -521,7 +521,7 @@ function reDraw()
 			var curGrp = groupArr[grpCol][grpRow];
 			if(curGrp != null && !grpDone.includes(curGrp))
 			{
-				console.log('drawing ' + curGrp);
+				//console.log('drawing ' + curGrp);
 				drawGroup(curGrp, notHovered);
 			}
 		}
@@ -537,7 +537,7 @@ function drawGroup(group, pct)
 	midCx.globalAlpha = pct;
 	midCx.fillStyle = HSLtoStr(group.colorInd);
 	midCx.fillRect(group.left, group.top, group.width, group.height);
-	console.log(pct);
+	//console.log(pct);
 	if(pct < notHovered) frontCx.globalAlpha = pct - hovered;
 	else frontCx.globalAlpha = 1;
 	frontCx.textAlign = "center";
@@ -622,7 +622,7 @@ function updateHover(event)
 		//if the group changed, update the previous
 		if(lastGroup !== null && lastGroup !== pair.group && typeof(lastGroup) !== 'number')
 		{
-			console.log(lastGroup);
+			//console.log(lastGroup);
 			drawGroup(lastGroup, notHovered);
 		}
 		lastGroup = pair.group;
