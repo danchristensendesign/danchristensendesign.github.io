@@ -753,8 +753,8 @@ function updateClick(event)
 		{
 			if(pair.group === 2) 
 			{
-				if(isMobile) location.assign(resume);
-				else window.open(resume);
+				var blocked = window.open(resume);
+				if(blocked === null) alert('popup blocker prevented the link from opening.');
 			}
 			else
 			{
@@ -825,8 +825,8 @@ function drawText(ind)
 	thumbInd = ind;
 	if(curScreen.data[ind][1] === LINK) 
 	{
-		if(isMobile) location.assign(curScreen.data[ind][0]);
-		else window.open(curScreen.data[ind][0]);
+		var blocked = window.open(curScreen.data[ind][0]);
+		if(blocked === null) alert('popup blocker prevented the link from opening.');
 		return;
 	}
 	
