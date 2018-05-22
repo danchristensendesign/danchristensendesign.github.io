@@ -117,20 +117,7 @@ var colors = [
 	<a id='dummy' style="visibility: hidden"</a>
 </div>
 
-<div id="textDiv" class="unselectable" style="position:absolute;"></div>
 
-<!-- <div id="opts3Div" class="unselectable" style="position:absolute; text-vertical-align:middle;"> 
-	save as <input type="text" id="fName"> </input> <button type="button" id="download" onclick="download();"> download </button><br><br>
-	<button type="button" id="synths" onclick="downloadSynths();"> download basic wave: </button>	
-	<input type="radio" id="header" name="curveInd"  checked> header
-	<input type="radio" id="hardware" name="curveInd" > hardware
-	<input type="radio" id="software" name="curveInd" > software
-	<input type="radio" id="fabrication" name="curveInd"> fabrication
-	<input type="radio" id="music/art" name="curveInd" > footer
-	<input type="radio" id="footer" name="curveInd" > saw Down  <br>
-	<input id="duty"  type="range" min="1" max="100" value="50"></input> duty cycle
-	<a id='dummy' style="visibility: hidden"</a>
-</div> -->
 
 <script>
 
@@ -200,14 +187,6 @@ var groupArr = [];
 var footer = [];
 initArr(groupArr, groupCols, groupRows);
 
-/* var headerDiv = document.getElementById("header");
-headerDiv.style.left = mainLeft + 'px';
-headerDiv.style.top = headerT + 'px';
-headerDiv.width = squaresW;
-headerDiv.style.align = 'center';
-var headerBDiv = document.getElementById("headerB");
-headerBDiv.style.left = mainLeft + 'px';
-headerBDiv.style.top = margin + 30 + -headerT + 'px'; */
 
 var mainDiv = document.getElementById("canvDiv");
 mainDiv.style.left = 0 + 'px';
@@ -247,6 +226,7 @@ for(var i = 0; i <= footerCover; i += 1)
 
 document.addEventListener("mousemove", updateHover);
 document.addEventListener("mouseup", updateClick);
+document.addEventListener("touchstart", updateClick);
 document.addEventListener("keydown", keyEvent);
 
 function keyEvent(event)
@@ -975,7 +955,7 @@ var contact = {
 
 var aboutMe = {
 	data: [
-	["I'm an engineer, designer, craftsman, artist, and musician. I love learning and am constantly pushing myself to figure out new things and solve interesting problems. \n \n I received my Bachelor's degree in Mechanical Engineering from South Dakota School of Mines & Technology, and from there worked as a Design Engineer for two years at Nexen Group, an industrial clutch and brake company. \n \n After that, I went back to school for three years for Music Composition. During that time I not only learned about music, but also honed my design skills, as composing is essentially engineering applied to music. \n \n After my second round of school, I've pursued various freelance jobs ranging from designer to artist to engineer to programmer. \n \n My biggest focus in the last year has been building up my programming and mechatronics skills. My digital synth project has been a great way to hone those skills, and my code base for it is nearly 10,000 lines long. I'm excited to finish this project, and I'm looking forward to my next interesting challenge.", TEXT, '']],
+	["I'm an engineer, designer, craftsman, artist, and musician. I love learning and am constantly pushing myself to figure out new things and solve interesting problems. \n \n I received my Bachelor's degree in Mechanical Engineering from South Dakota School of Mines & Technology, and from there worked as a Design Engineer for two years at Nexen Group, an industrial clutch and brake company. \n \n After that, I went back to school for three years for Music Composition. During that time I not only learned about music, but also honed my design skills, as composing is essentially engineering applied to music. \n \n After my second round of school, I've pursued various freelance jobs ranging from designer to artist to engineer to programmer. \n \n My biggest focus in the last year has been building up my programming and mechatronics skills. My digital synth project has been a great way to hone those skills, and my code base for it is about 4,500 lines long. I'm excited to finish this project, and I'm looking forward to my next interesting challenge.", TEXT, '']],
 	images: []
 };
 
