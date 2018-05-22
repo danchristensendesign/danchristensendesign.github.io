@@ -692,8 +692,20 @@ function updateHover(event)
 
 function getThumbInd(event)
 {
-	var x = event.clientX - dataInnerL;
-	var y = event.clientY - dataInnerT;
+	var x;
+	var y; 
+	if(event.type.substring(0, 5) === 'mouse')
+	{
+		x = event.clientX- dataInnerL;
+		y = event.clientY - dataInnerT;
+	}
+	else if(event.type.substring(0, 5) === 'touch')
+	{
+		x = event.pageX- dataInnerL;
+		y = event.pageY - dataInnerT;
+	}
+	else console.log(event.type);
+
 	//console.log(x + ', ' + y);
 	var ind;
 	if(x < 0 || x > dataInnerW || y < 0 || y > dataInnerH) return -2;
