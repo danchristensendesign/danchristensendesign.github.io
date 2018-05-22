@@ -586,7 +586,7 @@ function drawGroup(group, pct)
 	midCx.fillStyle = HSLtoStr(group.colorInd);
 	midCx.fillRect(group.left, group.top, group.width, group.height);
 	//console.log(pct);
-	if(pct < notHovered) frontCx.globalAlpha = pct - hovered;
+	if(pct < notHovered) frontCx.globalAlpha = Math.max(0, pct - hovered);
 	else frontCx.globalAlpha = 1;
 	frontCx.textAlign = "center";
 	frontCx.textBaseline = "middle";
@@ -618,6 +618,7 @@ function getGroupItem(event)
 	else if(event.type.substring(0, 5) === 'touch')
 	{
 		thumbH = thumbW;
+		isMobile = true;
 		x = event.pageX- squaresL;
 		y = event.pageY - squaresT;
 	}
@@ -676,9 +677,10 @@ function updateHover(event)
 			{
 				if(isMobile) 
 				{
-					if(lastGroup == pair.group) updateClick(event);
+					if(lastGroup === pair.group) updateClick(event);
 					else 
 					{
+						drawGroup(pair.group, 0);
 						var itemDone = [];
 						for(var itemCol = 0; itemCol < pair.group.cols; itemCol+= 1)
 						{
