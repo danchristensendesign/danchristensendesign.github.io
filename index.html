@@ -677,7 +677,13 @@ function updateHover(event)
 			{
 				if(isMobile) 
 				{
-					if(lastGroup === pair.group) updateClick(event);
+					if(lastGroup === pair.group) 
+					{
+						midCx.fillStyle = HSLtoStr(pair.group.colorInd);
+						midCx.globalAlpha = .4;
+						midCx.fillRect(pair.item.left, pair.item.top, pair.item.width, pair.item.height);
+						updateClick(event);
+					}
 					else 
 					{
 						drawGroup(pair.group, 0);
