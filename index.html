@@ -148,6 +148,7 @@ const screenReduc = squaresH/750;
 groupFont *= screenReduc;
 itemFont *= screenReduc;
 
+var isMobile = false;
 var headerT = (screenH - fullH)/2;
 var squaresT = Math.floor(headerT + headerHt);
 var squaresL = Math.floor((screenW - squaresW)/2);
@@ -226,8 +227,10 @@ for(var i = 0; i <= footerCover; i += 1)
 
 document.addEventListener("mousemove", updateHover);
 document.addEventListener("mousedown", updateClick);
-document.addEventListener("touchstart", updateClick);
 document.addEventListener("keydown", keyEvent);
+document.addEventListener("touchstart", updateHover);
+document.addEventListener("touchmove", updateHover);
+document.addEventListener("touchend", updateClick);
 
 function keyEvent(event)
 {
@@ -603,6 +606,7 @@ function getGroupItem(event)
 	}
 	else if(event.type.substring(0, 5) === 'touch')
 	{
+		thumbH = thumbW;
 		x = event.pageX- squaresL;
 		y = event.pageY - squaresT;
 	}
@@ -640,17 +644,14 @@ function coverFoot()
 
 function updateHover(event)
 {
+	//main page
 	if(curScreen == null)
 	{
 		coverFoot();
 		var pair = getGroupItem(event);
 		
 		//if the group changed, update the previous
-		if(lastGroup !== null && lastGroup !== pair.group && typeof(lastGroup) !== 'number')
-		{
-			//console.log(lastGroup);
-			drawGroup(lastGroup, notHovered);
-		}
+		if(lastGroup !== null && lastGroup !== pair.group && typeof(lastGroup) !== 'number') drawGroup(lastGroup, notHovered);
 		lastGroup = pair.group;
 		
 		if(pair.group != null)
