@@ -751,7 +751,11 @@ function updateClick(event)
 		var pair = getGroupItem(event);
 		if(typeof(pair.group) === "number")
 		{
-			if(pair.group === 2) window.open(resume);
+			if(pair.group === 2) 
+			{
+				if(isMobile) location.assign(resume);
+				else window.open(resume);
+			}
 			else
 			{
 				curScreen = footer[pair.group];
@@ -821,7 +825,8 @@ function drawText(ind)
 	thumbInd = ind;
 	if(curScreen.data[ind][1] === LINK) 
 	{
-		window.open(curScreen.data[ind][0]);
+		if(isMobile) location.assign(curScreen.data[ind][0]);
+		else window.open(curScreen.data[ind][0]);
 		return;
 	}
 	
