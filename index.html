@@ -229,8 +229,8 @@ document.addEventListener("mousemove", updateHover);
 document.addEventListener("mousedown", updateClick);
 document.addEventListener("keydown", keyEvent);
 document.addEventListener("touchstart", updateHover);
-document.addEventListener("touchmove", updateHover);
-document.addEventListener("touchend", updateClick);
+//document.addEventListener("touchmove", updateHover);
+//document.addEventListener("touchend", updateClick);
 
 function keyEvent(event)
 {
@@ -567,7 +567,7 @@ function reDraw()
 		for(var grpRow = 0; grpRow < groupRows; grpRow+= 1)
 		{
 			var curGrp = groupArr[grpCol][grpRow];
-			if(curGrp != null && !grpDone.includes(curGrp))
+			if(curGrp != null && !includes(curGrp, grpDone))
 			{
 				//console.log('drawing ' + curGrp);
 				drawGroup(curGrp, notHovered);
@@ -593,6 +593,17 @@ function drawGroup(group, pct)
 	frontCx.font = groupFont + famFont;
 	frontCx.fillStyle = groupTextFill;
 	frontCx.fillText(group.str, group.midLeft, group.midTop);
+}
+
+function drawItem(item)
+{
+	midCx.clearRect(item.left, item.top, item.width, item.height);
+	frontCx.globalAlpha = 1;
+	frontCx.textAlign = "center";
+	frontCx.textBaseline = "bottom";
+	frontCx.font = itemFont + famFont;
+	frontCx.fillStyle = itemTextFill;
+	frontCx.fillText(item.str, item.midLeft, item.top + item.height);	
 }
 
 function getGroupItem(event)
@@ -652,41 +663,49 @@ function updateHover(event)
 		
 		//if the group changed, update the previous
 		if(lastGroup !== null && lastGroup !== pair.group && typeof(lastGroup) !== 'number') drawGroup(lastGroup, notHovered);
-		lastGroup = pair.group;
 		
 		if(pair.group != null)
 		{
-			if(typeof(pair.group) === "number") midCx.clearRect(squaresL + pair.group * footerInc, footerT, footerW, footerH);
+			
+			if(typeof(pair.group) === "number") 
+			{
+				midCx.clearRect(squaresL + pair.group * footerInc, footerT, footerW, footerH);
+				if(isMobile)  updateClick(event);
+			}
 			else
 			{
-				var grpPct = Math.min(notHovered, Math.max(getPct(event, pair.group, grpScale), hovered));
-				drawGroup(pair.group, grpPct);
-				if(pair.item != null)
+				if(isMobile) 
 				{
-					var itemPct = getPct(event, pair.item, itemScale);
-					midCx.clearRect(pair.item.left, pair.item.top, pair.item.width, pair.item.height);
-					//midCx.globalAlpha = grpPct * itemPct;
-					//midCx.fillRect(pair.item.left, pair.item.top, pair.item.width, pair.item.height);
-					frontCx.globalAlpha = 1;
-					frontCx.textAlign = "center";
-					frontCx.textBaseline = "bottom";
-					frontCx.font = itemFont + famFont;
-					//frontCx.fillStyle = 'RGB(0,0,0)';
-
-					//var off = 1.5;
-					/* frontCx.fillText(pair.item.str, pair.item.midLeft-off, pair.item.top-2*off + pair.item.height);
-					frontCx.fillText(pair.item.str, pair.item.midLeft-off, pair.item.top + pair.item.height);
-					frontCx.fillText(pair.item.str, pair.item.midLeft+off, pair.item.top-2*off + pair.item.height);
-					frontCx.fillText(pair.item.str, pair.item.midLeft+off, pair.item.top + pair.item.height); */
-					//frontCx.fillText(pair.item.str, pair.item.midLeft-off, pair.item.top-off + pair.item.height);
-					frontCx.fillStyle = itemTextFill;
-					frontCx.fillText(pair.item.str, pair.item.midLeft, pair.item.top + pair.item.height);	
+					if(lastGroup == pair.group) updateClick(event);
+					else 
+					{
+						var itemDone = [];
+						for(var itemCol = 0; itemCol < pair.group.cols; itemCol+= 1)
+						{
+							for(var itemRow = 0; itemRow < pair.group.rows; itemRow+= 1)
+							{
+								var curItem = pair.group.itemArr[itemCol][itemRow];
+								if(curItem != null && !includes(curItem, itemDone))
+								{
+									drawItem(curItem);
+									itemDone.push(curItem);
+								}
+							}
+						}
+					}
+				}
+				else
+				{				
+					var grpPct = Math.min(notHovered, Math.max(getPct(event, pair.group, grpScale), hovered));
+					drawGroup(pair.group, grpPct);
+					if(pair.item != null) drawItem(pair.item);
 				}
 			}
 		}
-		
+		lastGroup = pair.group;
 		
 	}
+	else if(isMobile) updateClick(event);
 	else drawThumbHighlight(getThumbInd(event));
 
 }
