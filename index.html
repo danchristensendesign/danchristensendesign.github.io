@@ -225,7 +225,7 @@ for(var i = 0; i <= footerCover; i += 1)
 } */
 
 document.addEventListener("mousemove", updateHover);
-document.addEventListener("mouseup", updateClick);
+document.addEventListener("mousedown", updateClick);
 document.addEventListener("touchstart", updateClick);
 document.addEventListener("keydown", keyEvent);
 
@@ -594,8 +594,19 @@ function drawGroup(group, pct)
 
 function getGroupItem(event)
 {
-	var x = event.clientX- squaresL;
-	var y = event.clientY - squaresT;
+	var x;
+	var y; 
+	if(event.type.substring(0, 5) === 'mouse')
+	{
+		x = event.clientX- squaresL;
+		y = event.clientY - squaresT;
+	}
+	else if(event.type.substring(0, 5) === 'touch')
+	{
+		x = event.pageX- squaresL;
+		y = event.pageY - squaresT;
+	}
+	else console.log(event.type);
 	var pair = {group: null, item: null};
 	var outCol = x/blockW;
 	var outRow = y/blockH;
@@ -695,7 +706,6 @@ function getThumbInd(event)
 
 function updateClick(event)
 {
-	
 	if(curScreen == null)
 	{
 		var pair = getGroupItem(event);
