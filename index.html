@@ -392,7 +392,8 @@ function item(group, data, title, col, row, cols, rows)
 	this.data = data;
 	for(var i = 0; i < data.length; i += 1)
 	{
-		if(data[i][2].search('.jpg') > -1) this.data[i][2] = group.str + ' pics/' + data[i][2];
+		if(data[i][1] === LINK && data[i][2].search('.png') > -1) this.data[i][2] = 'link pics/' + data[i][2];
+		else if(data[i][2].search('.jpg') > -1) this.data[i][2] = group.str + ' pics/' + data[i][2];
 	}		
 	this.images = [];
 	this.firstImage = -1;
@@ -403,7 +404,7 @@ function loadItemImages(item)
 {
 	for(var i = 0; i < item.data.length; i += 1)
 	{
-		if(item.data[i][1] !== PIC) item.images.push(null);
+		if(item.data[i][1] !== PIC && item.data[i][1] !== LINK) item.images.push(null);
 		else
 		{
 			var img = document.createElement("img");
@@ -754,7 +755,7 @@ function updateClick(event)
 			if(pair.group === 2) 
 			{
 				
-				var blocked = window.open(resume);
+				var blocked = window.open(resume, '_self');
 				if(blocked === null) alert('popup blocker prevented the link from opening.');
 			}
 			else
@@ -815,9 +816,10 @@ function drawItemScreen(isNew)
 		else curThumbH = thumbH;
 		thumbR = thumbW/curThumbH;
 		
+		var tInd = (curScreen === footer[0])? 3: 0;
 		drawThumbs();
-		drawText(0);
-		drawThumbHighlight(0);
+		drawText(tInd);
+		drawThumbHighlight(tInd);
 	}
 }
 
@@ -938,7 +940,8 @@ function animateThumb()
 	var curTop = dataUseT + animInd * (curThumbH + thumbSpc);
 	var size = {w: thumbW, h: curThumbH};	
 	midCx.globalAlpha = 1;
-	if(curScreen.data[animInd][1] === PIC && curScreen.images[animInd] !== null)
+	console.log(curScreen.data[animInd] + '\n ' + curScreen.images[animInd]);
+	if((curScreen.data[animInd][1] === PIC || curScreen.data[animInd][1] === LINK) && curScreen.images[animInd] !== null)
 	{	
 		size = getBoundSize(curScreen.images[animInd], thumbR, thumbW, curThumbH);
 		midCx.drawImage(curScreen.images[animInd], dataButL + thumbW - size.w, curTop, size.w, size.h);
@@ -1038,10 +1041,11 @@ function addToArr(obj, baseCol, baseRow, cols, rows, arr)
 //footer...................................................................................
 var contact = {
 	data: [
-	['\t \t \t email: \n \n \t \t \t  \t \t \t hello.dcdesigns@gmail.com \n \n \n \t \t \t phone/text: \n \n \t \t \t \t \t \t 605-890-0628', TEXT, 'info'],
-	['mailto:hello.dcdesigns@gmail.com', LINK, 'email'],
-	['tel:6058900628', LINK, 'call'],
-	['sms:6058900628', LINK, 'text']],
+	
+	['mailto:hello.dcdesigns@gmail.com', LINK, 'link pics/email.png'],
+	['tel:6058900628', LINK, 'link pics/phone.png'],
+	['sms:6058900628', LINK, 'link pics/text.png'],
+	['\t \t \t email: \n \n \t \t \t  \t \t \t hello.dcdesigns@gmail.com \n \n \n \t \t \t phone/text: \n \n \t \t \t \t \t \t 605-890-0628', TEXT, '']],
 	images: []
 };
 
@@ -1051,19 +1055,19 @@ var aboutMe = {
 	images: []
 };
 
-var skills = {
+/* var skills = {
 	data: [
 	['Resume', PIC, 'resume.jpg']],
 	images: []
-};
+}; */
 
 var resume = 'https://dcdesigns.github.io/dan christensen resume.pdf';
 
 footer.push(contact);
 footer.push(aboutMe);
-footer.push(skills);
+//footer.push(skills);
 
-
+loadItemImages(contact);
 
 
 //hardware .........................................................................
@@ -1100,7 +1104,7 @@ var sign = [
 	['This photo shows four metal shims positioned in the way of the top gear. This is a clicker mechanism; my clients specifically requested the sign create a satisfying sound with every rotation.', PIC, 'sign motor cool.jpg'],
 	['Here is the SolidWorks model used during the design consultations and fabrication.', PIC, 'sign model.jpg'],
 	['A drawing with clear directions used to create the motor support pieces. \n \n Some dimensions are intentionally missing. Instead of trying to measure and mark every cut and hole precisely, I printed this drawing out to scale and glued it directly to the plexiglass to serve as my guide.', PIC, 'sign drawing.jpg'],
-	['https://www.youtube.com/watch?v=oBpSsI6MKfg', LINK, 'video']
+	['https://www.youtube.com/watch?v=oBpSsI6MKfg', LINK, 'video.png']
 ];
 
 var crank = [
@@ -1113,7 +1117,7 @@ var crank = [
 	["SolidWorks drawing of the crank wheel and symbols. \n \n I printed this out to scale on contact paper and adhered it directly to the plexiglass as a guide for shaping it.", PIC, 'crank drawing.jpg'],
 	["For each piece, I printed out its design on contact paper, adhered the contact paper to the piece, and then stenciled out the design by hand using an exacto knife.  \n \n After this step, I spray painted each piece to fill in the symbol.", PIC, 'crank stencils.jpg'], 
 	//["The nearly completed control panel on my workshop bench.", PIC, 'crank bench.jpg'],
-	['https://www.youtube.com/watch?v=oBpSsI6MKfg', LINK, 'video']
+	['https://www.youtube.com/watch?v=oBpSsI6MKfg', LINK, 'video.png']
 ];
 	
 
@@ -1145,17 +1149,17 @@ var sensory = [
 
 var snowboard = [
 	['Snowboard designer for a video game. \n \n I created a JavaScript app to design custom snowboard shapes for a procedurally generated snowboarding game my brothers and I were collaborating on. The app outputs a text file containing a 3-D array of points defining the board. We can then easily import the text into the game code. \n \n The most interesting challenge for this project was coding my own cubic spline interpolator to facilitate the creation of interesting yet smooth board shapes from a small number of defined points. \n \n Writing it in JavaScript means it can easily run in most web browsers without any installation.', PIC, 'board graphic.jpg'],
-	['https://dcdesigns.github.io/boardDesigner/', LINK, 'Try it' ]
+	['https://dcdesigns.github.io/boardDesigner/', LINK, 'link.png' ]
 ];
 
 var wavtabler = [
 	["Wave table maker for digital synth. \n \n I created this JavaScript app for my digital synthesizer (shown on the main page). \n \n This app lets you open an audio file and select a specific portion of it to copy as a wave table (an array that stores the samples for one full wave cycle). The selected portion of the original file is resampled for the selected table size and normalized. \n \n  The download button outputs a binary file of the wave table that I can load directly onto my synthesizer's microSD card. \n \n Note: this version works best with <15 second sound snippets, and I have pre-loaded a short clip for convenience.", PIC, 'wave graphic.jpg'],
-	['https://dcdesigns.github.io/waveTableMaker/', LINK, 'Try it' ]
+	['https://dcdesigns.github.io/waveTableMaker/', LINK, 'link.png' ]
 ];
 
 var blockjumper = [
 	["Minimalist web-based puzzle game created with JavaScript. \n \n I made this simple puzzle game with three goals in mind: \n \n 1. Learn basic web animation. \n 2. Learn how to implement sprite art. \n 3. Design a minimalist game that teaches players the game mechanics incrementally and naturally, without any explicit instructions or handholding. \n \n From this experience, I gained a new appreciation for the serious skills involved with level design in games.", PIC, 'block graphic.jpg'],
-	['https://dcdesigns.github.io/blocksGame/', LINK, 'Try it']
+	['https://dcdesigns.github.io/blocksGame/', LINK, 'link.png']
 ];
 
 new item(software, sensory, "reporting program", 0,0, 1, 1);
@@ -1177,7 +1181,7 @@ var dresser = [
 	['The solid works model used during design and fabrication.', PIC, 'dresser openclose.jpg'],
 	//['Playing with color combinations.', PIC, 'dresser colors.jpg'],
 	
-	['https://youtu.be/TYAhS4yGJI8', LINK, 'Video']
+	['https://youtu.be/TYAhS4yGJI8', LINK, 'video.png']
 	
 ];
 
@@ -1238,7 +1242,7 @@ var drawings = [
 
 var city = [
 	['Web app simulation of an endless cityscape. \n \n This was a fun way to play with randomized generation of colors and shape, as well as animation layering in a web browser.', PIC, 'city graphic.jpg'],
-	['https://dcdesigns.github.io/cityScape/', LINK, 'Try it'],
+	['https://dcdesigns.github.io/cityScape/', LINK, 'link.png'],
 ];
 
 new item(art, arrange, "arrangements", 0,0, 1, 1);
