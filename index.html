@@ -753,6 +753,7 @@ function updateClick(event)
 		{
 			if(pair.group === 2) 
 			{
+				
 				var blocked = window.open(resume);
 				if(blocked === null) alert('popup blocker prevented the link from opening.');
 			}
@@ -766,6 +767,7 @@ function updateClick(event)
 		{
 			thumbInd = 0;
 			curScreen = pair.item;
+			//console.log(curScreen);
 			drawItemScreen(true);
 		}
 	}
@@ -774,7 +776,7 @@ function updateClick(event)
 		ind = getThumbInd(event);
 		if(ind == -2)
 		{
-			console.log('out');
+			//console.log('out');
 			curScreen = null;
 			reDraw();
 			updateHover(event);
@@ -825,7 +827,9 @@ function drawText(ind)
 	thumbInd = ind;
 	if(curScreen.data[ind][1] === LINK) 
 	{
-		var blocked = window.open(curScreen.data[ind][0]);
+		console.log(curScreen);
+
+		var blocked = window.open(curScreen.data[ind][0], '_self');
 		if(blocked === null) alert('popup blocker prevented the link from opening.');
 		return;
 	}
@@ -1034,7 +1038,8 @@ function addToArr(obj, baseCol, baseRow, cols, rows, arr)
 //footer...................................................................................
 var contact = {
 	data: [
-	['contact info: \n \n \n email    danchristensendesign@gmail.com \n \n cell       605-890-0628', TEXT, '']],
+	['contact info: \n \n \n email    hello.dcdesigns@gmail.com \n \n cell       605-890-0628', TEXT, ''],
+	['mailto:hello.dcdesigns@gmail.com', LINK, 'email me']],
 	images: []
 };
 
@@ -1050,7 +1055,7 @@ var skills = {
 	images: []
 };
 
-var resume = 'https://danchristensendesign.github.io/dan christensen resume.pdf';
+var resume = 'https://dcdesigns.github.io/dan christensen resume.pdf';
 
 footer.push(contact);
 footer.push(aboutMe);
@@ -1138,17 +1143,17 @@ var sensory = [
 
 var snowboard = [
 	['Snowboard designer for a video game. \n \n I created a JavaScript app to design custom snowboard shapes for a procedurally generated snowboarding game my brothers and I were collaborating on. The app outputs a text file containing a 3-D array of points defining the board. We can then easily import the text into the game code. \n \n The most interesting challenge for this project was coding my own cubic spline interpolator to facilitate the creation of interesting yet smooth board shapes from a small number of defined points. \n \n Writing it in JavaScript means it can easily run in most web browsers without any installation.', PIC, 'board graphic.jpg'],
-	['https://danchristensendesign.github.io/boardDesigner/', LINK, 'Try it' ]
+	['https://dcdesigns.github.io/boardDesigner/', LINK, 'Try it' ]
 ];
 
 var wavtabler = [
 	["Wave table maker for digital synth. \n \n I created this JavaScript app for my digital synthesizer (shown on the main page). \n \n This app lets you open an audio file and select a specific portion of it to copy as a wave table (an array that stores the samples for one full wave cycle). The selected portion of the original file is resampled for the selected table size and normalized. \n \n  The download button outputs a binary file of the wave table that I can load directly onto my synthesizer's microSD card. \n \n Note: this version works best with <15 second sound snippets, and I have pre-loaded a short clip for convenience.", PIC, 'wave graphic.jpg'],
-	['https://danchristensendesign.github.io/waveTableMaker/', LINK, 'Try it' ]
+	['https://dcdesigns.github.io/waveTableMaker/', LINK, 'Try it' ]
 ];
 
 var blockjumper = [
 	["Minimalist web-based puzzle game created with JavaScript. \n \n I made this simple puzzle game with three goals in mind: \n \n 1. Learn basic web animation. \n 2. Learn how to implement sprite art. \n 3. Design a minimalist game that teaches players the game mechanics incrementally and naturally, without any explicit instructions or handholding. \n \n From this experience, I gained a new appreciation for the serious skills involved with level design in games.", PIC, 'block graphic.jpg'],
-	['https://danchristensendesign.github.io/blocksGame/', LINK, 'Try it']
+	['https://dcdesigns.github.io/blocksGame/', LINK, 'Try it']
 ];
 
 new item(software, sensory, "reporting program", 0,0, 1, 1);
@@ -1231,7 +1236,7 @@ var drawings = [
 
 var city = [
 	['Web app simulation of an endless cityscape. \n \n This was a fun way to play with randomized generation of colors and shape, as well as animation layering in a web browser.', PIC, 'city graphic.jpg'],
-	['https://danchristensendesign.github.io/cityScape/', LINK, 'Try it'],
+	['https://dcdesigns.github.io/cityScape/', LINK, 'Try it'],
 ];
 
 new item(art, arrange, "arrangements", 0,0, 1, 1);
