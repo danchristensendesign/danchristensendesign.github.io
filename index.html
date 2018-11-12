@@ -393,7 +393,7 @@ function item(group, data, title, col, row, cols, rows)
 	for(var i = 0; i < data.length; i += 1)
 	{
 		if(data[i][1] === LINK && data[i][2].search('.png') > -1) this.data[i][2] = 'link pics/' + data[i][2];
-		else if(data[i][2].search('.jpg') > -1) this.data[i][2] = group.str + ' pics/' + data[i][2];
+		else if(data[i][2].search('.png') > -1 || data[i][2].search('.jpg') > -1) this.data[i][2] = group.str + ' pics/' + data[i][2];
 	}		
 	this.images = [];
 	this.firstImage = -1;
@@ -816,7 +816,7 @@ function drawItemScreen(isNew)
 		else curThumbH = thumbH;
 		thumbR = thumbW/curThumbH;
 		
-		var tInd = (curScreen === footer[0])? 3: 0;
+		var tInd = 0;//(curScreen === footer[0])? 3: 0;
 		drawThumbs();
 		drawText(tInd);
 		drawThumbHighlight(tInd);
@@ -1042,10 +1042,10 @@ function addToArr(obj, baseCol, baseRow, cols, rows, arr)
 var contact = {
 	data: [
 	
+	['', PIC, 'link pics/card contact.png'],
 	['mailto:hello.dcdesigns@gmail.com', LINK, 'link pics/email.png'],
 	['tel:6058900628', LINK, 'link pics/phone.png'],
-	['sms:6058900628', LINK, 'link pics/text.png'],
-	['', PIC, 'card contact.png']],
+	['sms:6058900628', LINK, 'link pics/text.png']],
 	images: []
 };
 
