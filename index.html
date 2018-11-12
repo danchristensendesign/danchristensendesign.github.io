@@ -127,6 +127,7 @@ var colors = [
 const PIC = 0;
 const TEXT = 1;
 const LINK = 2;
+const PIC2 = 3;
 const screenW = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth);
 const screenH = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight);
 const fullW = screenW - 2 * margin;
@@ -404,7 +405,7 @@ function loadItemImages(item)
 {
 	for(var i = 0; i < item.data.length; i += 1)
 	{
-		if(item.data[i][1] !== PIC && item.data[i][1] !== LINK) item.images.push(null);
+		if(item.data[i][1] !== PIC && item.data[i][1] !== LINK && item.data[i][1] !== PIC2) item.images.push(null);
 		else
 		{
 			var img = document.createElement("img");
@@ -941,7 +942,10 @@ function animateThumb()
 	var size = {w: thumbW, h: curThumbH};	
 	midCx.globalAlpha = 1;
 	console.log(curScreen.data[animInd] + '\n ' + curScreen.images[animInd]);
-	if((curScreen.data[animInd][1] === PIC || curScreen.data[animInd][1] === LINK) && curScreen.images[animInd] !== null)
+	if(curScreen.data[animInd][1] === PIC2)
+	{
+	}	
+	else if((curScreen.data[animInd][1] === PIC || curScreen.data[animInd][1] === LINK) && curScreen.images[animInd] !== null)
 	{	
 		size = getBoundSize(curScreen.images[animInd], thumbR, thumbW, curThumbH);
 		midCx.drawImage(curScreen.images[animInd], dataButL + thumbW - size.w, curTop, size.w, size.h);
@@ -1041,11 +1045,11 @@ function addToArr(obj, baseCol, baseRow, cols, rows, arr)
 //footer...................................................................................
 var contact = {
 	data: [
-	
-	['', PIC, 'link pics/card contact.png'],
-	['mailto:hello.dcdesigns@gmail.com', LINK, 'link pics/email.png'],
+
+	['', PIC2, 'link pics/card contact.png'],
 	['tel:6058900628', LINK, 'link pics/phone.png'],
-	['sms:6058900628', LINK, 'link pics/text.png']],
+	['sms:6058900628', LINK, 'link pics/text.png'],
+	['mailto:hello.dcdesigns@gmail.com', LINK, 'link pics/email.png']],
 	images: []
 };
 
