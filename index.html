@@ -128,6 +128,7 @@ const PIC = 0;
 const TEXT = 1;
 const LINK = 2;
 const PIC2 = 3;
+const LINK2 = 4;
 const screenW = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth);
 const screenH = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight);
 const fullW = screenW - 2 * margin;
@@ -393,7 +394,7 @@ function item(group, data, title, col, row, cols, rows)
 	this.data = data;
 	for(var i = 0; i < data.length; i += 1)
 	{
-		if(data[i][1] === LINK && data[i][2].search('.png') > -1) this.data[i][2] = 'link pics/' + data[i][2];
+		if((data[i][1] === LINK || data[i][1] === LINK2) && data[i][2].search('.png') > -1) this.data[i][2] = 'link pics/' + data[i][2];
 		else if(data[i][2].search('.png') > -1 || data[i][2].search('.jpg') > -1) this.data[i][2] = group.str + ' pics/' + data[i][2];
 	}		
 	this.images = [];
@@ -405,7 +406,7 @@ function loadItemImages(item)
 {
 	for(var i = 0; i < item.data.length; i += 1)
 	{
-		if(item.data[i][1] !== PIC && item.data[i][1] !== LINK && item.data[i][1] !== PIC2) item.images.push(null);
+		if(item.data[i][1] !== PIC && item.data[i][1] !== LINK && item.data[i][1] !== LINK2 && item.data[i][1] !== PIC2) item.images.push(null);
 		else
 		{
 			var img = document.createElement("img");
@@ -740,7 +741,7 @@ function getThumbInd(event)
 	var ind;
 	if(x < 0 || x > dataInnerW || y < 0 || y > dataInnerH) return -2;
 	var ind = (y -thumbSpc/2)/(curThumbH + thumbSpc);
-	if(x > thumbW + 2* dataBorder) ind = -1;
+	//if(x > thumbW + 2* dataBorder) ind = -1;
 	
 	return Math.floor(ind);
 	
@@ -828,7 +829,7 @@ function drawText(ind)
 {
 	if(ind < 0 || ind >= curScreen.data.length) return;
 	thumbInd = ind;
-	if(curScreen.data[ind][1] === LINK) 
+	if(curScreen.data[ind][1] === LINK || curScreen.data[ind][1] === LINK2) 
 	{
 		console.log(curScreen);
 
@@ -945,7 +946,7 @@ function animateThumb()
 	if(curScreen.data[animInd][1] === PIC2)
 	{
 	}	
-	else if((curScreen.data[animInd][1] === PIC || curScreen.data[animInd][1] === LINK) && curScreen.images[animInd] !== null)
+	else if((curScreen.data[animInd][1] === PIC || curScreen.data[animInd][1] === LINK || curScreen.data[animInd][1] === LINK2) && curScreen.images[animInd] !== null)
 	{	
 		size = getBoundSize(curScreen.images[animInd], thumbR, thumbW, curThumbH);
 		midCx.drawImage(curScreen.images[animInd], dataButL + thumbW - size.w, curTop, size.w, size.h);
@@ -960,6 +961,15 @@ function animateThumb()
 		midCx.font = thumbFont + famFont;
 		midCx.fillText(curScreen.data[animInd][2], dataButL + size.w/2, curTop + size.h/2);
 	}
+	if(curScreen.data[animInd][1] === LINK2)
+	{
+		midCx.textAlign = "left";
+		midCx.textBaseline = "middle";
+		midCx.fillStyle = 'RGB(0,0,0)';
+		midCx.fillText(curScreen.data[animInd][3], dataTextL, curTop + size.h/2);
+	}
+	
+		
 	animInd += 1;
 	if(animInd <= animEnd) requestAnimationFrame(animateThumb);
 }
@@ -1046,10 +1056,10 @@ function addToArr(obj, baseCol, baseRow, cols, rows, arr)
 var contact = {
 	data: [
 
-	['', PIC2, 'link pics/card contact.png'],
-	['tel:6058900628', LINK, 'link pics/phone.png'],
-	['sms:6058900628', LINK, 'link pics/text.png'],
-	['mailto:hello.dcdesigns@gmail.com', LINK, 'link pics/email.png']],
+	['contact dan @', TEXT, 'big'],
+	['tel:6058900628', LINK2, 'link pics/phone.png', '605.890.0628'],
+	['sms:6058900628', LINK2, 'link pics/text.png', '605.890.0628'],
+	['mailto:hello.dcdesigns@gmail.com', LINK2, 'link pics/email.png', 'hello.dcdesigns@gmail.com']],
 	images: []
 };
 
